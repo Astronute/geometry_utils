@@ -129,6 +129,19 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, Node* root){
     return res;
 }
 
+void GeometryUtils::sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary) {
+    int len = boundary.size();
+
+    double Sx2 = 0.0;
+    for (int i = 0; i < boundary.size(); ++i) {
+        Sx2 += (boundary[(i + 1) % len](0) - boundary[i](0)) * (boundary[(i + 1) % len](1) + boundary[i](1));
+    }
+    if (Sx2 > 0) {
+        std::reverse(boundary.begin(), boundary.end());
+    }
+
+}
+
 std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::vector<Eigen::Vector2d>& region_0, const std::vector<Eigen::Vector2d>& region_1) {
     std::vector<std::vector<Eigen::Vector2d>> res;
 
@@ -183,3 +196,5 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
 
     return res;
 }
+
+

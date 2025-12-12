@@ -21,11 +21,13 @@ public:
 
     void printPolygon(Node* root);
 
-    Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
-
     Node* nextNonIntersection(Node* n);
 
-    double pointInPolygon(const Eigen::Vector2d &p, Node* root);
+    double pointInPolygon(const Eigen::Vector2d& p, Node* root);
+
+    Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
+    
+    void sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary);
 
     std::vector<std::vector<Eigen::Vector2d>> calc_AnotB(const std::vector<Eigen::Vector2d>& region_0, const std::vector<Eigen::Vector2d>& region_1);
 

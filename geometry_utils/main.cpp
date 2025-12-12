@@ -23,10 +23,11 @@ void main() {
                                            Eigen::Vector2d(2, 10),
                                            Eigen::Vector2d(1, 10) };
 
-
+    
     GeometryUtils GU;
     std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     for (int i = 0; i < polygons.size(); ++i) {
+        GU.sort_polygon_vertices_ccw(polygons[i]);
         for (auto p : polygons[i]) {
             std::cout << "polygon " << i << ": " << p.transpose() << std::endl;
         }
