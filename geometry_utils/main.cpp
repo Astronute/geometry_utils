@@ -14,16 +14,28 @@
 
 void main() {
     // region test
-    std::vector<Eigen::Vector2d> region_0{ Eigen::Vector2d(0, 0),
-                                       Eigen::Vector2d(4, 0),
-                                       Eigen::Vector2d(4, 4),
-                                       Eigen::Vector2d(0, 3) };
-    std::vector<Eigen::Vector2d> region_1{ Eigen::Vector2d(1, 0),
-                                           Eigen::Vector2d(2, 0),
-                                           Eigen::Vector2d(2, 10),
-                                           Eigen::Vector2d(1, 10) };
+    //std::vector<Eigen::Vector2d> region_0{ Eigen::Vector2d(0, 0),
+    //                                   Eigen::Vector2d(10, 0),
+    //                                   Eigen::Vector2d(10, 2),
+    //                                   Eigen::Vector2d(0, 2)
+    //};
+    std::vector<Eigen::Vector2d> region_0{ Eigen::Vector2d(42.3596, 16.3366),
+                                   Eigen::Vector2d(12.5464, 20.5956),
+                                   Eigen::Vector2d(5.08082, 1.93173),
+                                   Eigen::Vector2d(26.7527, -8.90419),
+                                   Eigen::Vector2d(19.6569, -16),
+                                   Eigen::Vector2d(33.5279, -16),
+                                   Eigen::Vector2d(30.3167, -9.57771),
+                                   Eigen::Vector2d(45.3167, 10.4223)
+    };
 
-    
+    std::vector<Eigen::Vector2d> region_1{ Eigen::Vector2d(10,  0),
+                                           Eigen::Vector2d(22,  2),
+                                           Eigen::Vector2d(40,  0),
+                                           Eigen::Vector2d(25,  5),
+                                           Eigen::Vector2d(30, 10) };
+
+
     GeometryUtils GU;
     std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     for (int i = 0; i < polygons.size(); ++i) {

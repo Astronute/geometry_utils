@@ -1,5 +1,6 @@
 #include "intersecter.h"
 
+
 Intersecter::Intersecter(){
 	
 }
@@ -75,19 +76,23 @@ int Intersecter::statusCompare(EventNode* ev1, EventNode* ev2) {
 		throw std::invalid_argument("statusCompare: null pointer");
 	}
 
-	Eigen::Vector2d ev1_vec = ev1->seg->end - ev1->seg->start;
+	// 求局部上下关系
+	Eigen::Vector2d ev2_vec = ev2->seg->end - ev2->seg->start;
 
-	Eigen::Vector2d vec_s = ev2->seg->start - ev1->seg->start;
-	Eigen::Vector2d vec_e = ev2->seg->end - ev1->seg->start;
-	double cross1 = ev1_vec(0) * vec_s(1) - ev1_vec(1) * vec_s(0);
-	double cross2 = ev1_vec(0) * vec_e(1) - ev1_vec(1) * vec_e(0);
-	if (std::fabs(cross1) < 1e-10) {
+	Eigen::Vector2d vec_ss = ev1->seg->start - ev2->seg->start;
+	Eigen::Vector2d vec_se = ev1->seg->end - ev2->seg->start;
+	double cross1 = ev2_vec(0) * vec_ss(1) - ev2_vec(1) * vec_ss(0);
+	double cross2 = ev2_vec(0) * vec_se(1) - ev2_vec(1) * vec_se(0);
+	if (std::fabs(cross1) < 1e-10) { // 共线
 		if (std::fabs(cross2) < 1e-10) {
 			return 1;
 		}
-		return cross2 <= -1e-10 ? 1 : -1;
 	}
-	return cross1 <= -1e-10 ? 1 : -1;
+	// 不共线通过与扫描线交点判断局部上下关系
+	double inc_t = (ev1->seg->start(0) - ev2->seg->start(0)) / (ev2->seg->end(0) - ev2->seg->start(0));
+	double inc_y = ev2->seg->start(1) + inc_t * (ev2->seg->end(1) - ev2->seg->start(1));
+
+	return inc_y > ev1->seg->start(1) ? -1 : 1;
 }
 
 void Intersecter::eventAdd(EventNode* const root, EventNode* const node, const Eigen::Vector2d other_pt) {
@@ -116,8 +121,8 @@ GU::Intersection Intersecter::linesIntersection(const Eigen::Vector2d& a0, const
 
 	GU::Intersection inc;
 	double cross_ab = A_vec(0) * B_vec(1) - A_vec(1) * B_vec(0);
+	inc.cross = cross_ab;
 	if (std::fabs(cross_ab) < 1e-10) {
-		inc.cross = cross_ab;
 		return inc;
 	}
 	Eigen::Matrix2d A(2, 2);
