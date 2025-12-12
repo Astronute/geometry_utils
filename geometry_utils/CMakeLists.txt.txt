@@ -1,0 +1,32 @@
+# 最低CMake版本要求
+cmake_minimum_required(VERSION 3.10)
+
+# 库名称+版本+语言标准
+project(geometry_utils VERSION 1.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 1. 收集库的源码文件（.cpp）
+file(GLOB_RECURSE LIB_SOURCES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+)
+
+# 2. 生成动态库（SHARED关键字）
+add_library(geometry_utils SHARED
+    ${LIB_SOURCES}
+)
+
+# 3. 指定头文件路径（对外暴露的include目录）
+target_include_directories(geometry_utils
+    PUBLIC  # 公开头文件，让使用库的程序能#include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    # 若依赖Eigen，需加Eigen的头文件路径
+    /usr/include/eigen3  # 替换为你的Eigen实际路径
+)
+
+# 4. 可选：设置库的输出路径（默认在build/lib，可自定义）
+set_target_properties(geometry_utils PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib  # .so输出到build/lib
+    VERSION ${PROJECT_VERSION}                                # 库版本（如libgeometry_utils.so.1.0）
+    SOVERSION 1                                               # API版本（如libgeometry_utils.so.1）
+)
