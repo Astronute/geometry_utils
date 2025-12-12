@@ -17,22 +17,22 @@ public:
     GeometryUtils();
     ~GeometryUtils();
 
-    Node* upgradePolygon(const std::vector<Eigen::Vector2d> &p);
+    GU::Node* upgradePolygon(const std::vector<Eigen::Vector2d> &p);
 
-    void printPolygon(Node* root);
+    void printPolygon(GU::Node* root);
 
-    Node* nextNonIntersection(Node* n);
+    GU::Node* nextNonIntersection(GU::Node* n);
 
-    double pointInPolygon(const Eigen::Vector2d& p, Node* root);
+    double pointInPolygon(const Eigen::Vector2d& p, GU::Node* root);
 
-    Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
+    GU::Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
     
     void sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary);
 
     std::vector<std::vector<Eigen::Vector2d>> calc_AnotB(const std::vector<Eigen::Vector2d>& region_0, const std::vector<Eigen::Vector2d>& region_1);
 
 private:
-    std::vector<Node*> all_polygon_node_;
+    std::vector<GU::Node*> all_polygon_node_;
     std::vector<Segment*> all_segment_ptr_;
 };
 

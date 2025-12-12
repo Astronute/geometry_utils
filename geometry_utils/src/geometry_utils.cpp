@@ -25,10 +25,10 @@ GeometryUtils::~GeometryUtils() {
     all_segment_ptr_.clear();
 }
 
-Node* GeometryUtils::upgradePolygon(const std::vector<Eigen::Vector2d> &p){
-    Node* root = nullptr;
+GU::Node* GeometryUtils::upgradePolygon(const std::vector<Eigen::Vector2d> &p){
+    GU::Node* root = nullptr;
     for(int i=0; i<p.size(); ++i){
-        Node* node = new Node();
+        GU::Node* node = new GU::Node();
         all_polygon_node_.push_back(node);
         node->p = p[i];
         if(root == nullptr){
@@ -37,7 +37,7 @@ Node* GeometryUtils::upgradePolygon(const std::vector<Eigen::Vector2d> &p){
             root = node;
         }
         else{
-            Node* last_node = root->prev;
+            GU::Node* last_node = root->prev;
             last_node->next = node;
             root->prev = node;
             node->prev = last_node;
@@ -48,8 +48,8 @@ Node* GeometryUtils::upgradePolygon(const std::vector<Eigen::Vector2d> &p){
     return root;
 }
 
-void GeometryUtils::printPolygon(Node* root) {
-    Node* p = root;
+void GeometryUtils::printPolygon(GU::Node* root) {
+    GU::Node* p = root;
     do {
         std::cout << p->p.transpose() << std::endl;
         p = p->next;
@@ -57,12 +57,12 @@ void GeometryUtils::printPolygon(Node* root) {
 }
 
 
-Intersection GeometryUtils::calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1){
+GU::Intersection GeometryUtils::calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1){
     Eigen::Vector2d A_vec = a1 - a0;
     Eigen::Vector2d B_vec = b1 - b0;
 
     double cross = A_vec(0)*B_vec(1) - A_vec(1)*B_vec(0);
-    Intersection inc;
+    GU::Intersection inc;
     inc.cross = cross;
     if(cross == 0){
         std::cout << " GeometryUtils calc_linesIntersect: || " << std::endl;
@@ -85,8 +85,8 @@ Intersection GeometryUtils::calc_linesIntersect(const Eigen::Vector2d &a0, const
 }
 
 
-Node* GeometryUtils::nextNonIntersection(Node* n){
-    Node* node = n;
+GU::Node* GeometryUtils::nextNonIntersection(GU::Node* n){
+    GU::Node* node = n;
     do{
         node = node->next;
     }while(n->is_intersection);
@@ -95,12 +95,12 @@ Node* GeometryUtils::nextNonIntersection(Node* n){
 }
 
 
-double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, Node* root){
+double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, GU::Node* root){
     double res = 0;
     int counter = 0;
-    Node* Pcur = root;
+    GU::Node* Pcur = root;
     do{
-        Node* Pnext = Pcur->next;
+        GU::Node* Pnext = Pcur->next;
         if((p(1)>= Pcur->p(1)&&p(1)>= Pnext->p(1)) || (p(1)< Pcur->p(1)&&p(1)< Pnext->p(1)) || (p(0)> Pcur->p(0)&&p(0)> Pnext->p(0))){
             if (p(1) == Pcur->p(1) && p(1) == Pnext->p(1) && ((p(0) >= Pcur->p(0) && p(0) <= Pnext->p(0))|| (p(0) <= Pcur->p(0) && p(0) >= Pnext->p(0)))) {
                 return 0;

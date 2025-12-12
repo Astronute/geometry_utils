@@ -29,7 +29,7 @@ public:
 
 	EventNode* checkBothIntersections(EventNode* ev, EventNode* above, EventNode* below);
 
-	Intersection linesIntersection(const Eigen::Vector2d& a0, const Eigen::Vector2d& a1, const Eigen::Vector2d& b0, const Eigen::Vector2d& b1);
+	GU::Intersection linesIntersection(const Eigen::Vector2d& a0, const Eigen::Vector2d& a1, const Eigen::Vector2d& b0, const Eigen::Vector2d& b1);
 
 	void addRegion(const std::vector<Eigen::Vector2d> &region, const bool& primary);
 

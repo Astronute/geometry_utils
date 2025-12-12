@@ -38,9 +38,9 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
             return polygons;
         }
 
-        std::shared_ptr<MatchPoint> first_match = std::make_shared<MatchPoint>(0, false, false);
-        std::shared_ptr<MatchPoint> second_match = std::make_shared<MatchPoint>(0, false, false);
-        std::shared_ptr<MatchPoint> next_match = first_match;
+        std::shared_ptr<GU::MatchPoint> first_match = std::make_shared<GU::MatchPoint>(0, false, false);
+        std::shared_ptr<GU::MatchPoint> second_match = std::make_shared<GU::MatchPoint>(0, false, false);
+        std::shared_ptr<GU::MatchPoint> next_match = first_match;
         auto setMatch = [&](int index, bool m_chain_head_start, bool m_seg_start) {
             next_match->index = index;
             next_match->matchs_chain_head = m_chain_head_start;

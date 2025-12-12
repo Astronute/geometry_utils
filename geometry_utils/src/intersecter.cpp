@@ -110,11 +110,11 @@ void Intersecter::eventAdd(EventNode* const root, EventNode* const node, const E
 	node->next = nullptr;
 }
 
-Intersection Intersecter::linesIntersection(const Eigen::Vector2d& a0, const Eigen::Vector2d& a1, const Eigen::Vector2d& b0, const Eigen::Vector2d& b1) {
+GU::Intersection Intersecter::linesIntersection(const Eigen::Vector2d& a0, const Eigen::Vector2d& a1, const Eigen::Vector2d& b0, const Eigen::Vector2d& b1) {
 	Eigen::Vector2d A_vec = a1 - a0;
 	Eigen::Vector2d B_vec = b1 - b0;
 
-	Intersection inc;
+	GU::Intersection inc;
 	double cross_ab = A_vec(0) * B_vec(1) - A_vec(1) * B_vec(0);
 	if (std::fabs(cross_ab) < 1e-10) {
 		inc.cross = cross_ab;
@@ -140,7 +140,7 @@ Intersection Intersecter::linesIntersection(const Eigen::Vector2d& a0, const Eig
 // nullptr: 平行不共线/首尾相接/不平行相交 （没有交点）
 // ev2: 共线完全重叠/共线有重叠且起点对齐 切割后的ev2(ev2与ev1的重叠部分)
 EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
-	Intersection inc = linesIntersection(ev1->seg->start, ev1->seg->end, ev2->seg->start, ev2->seg->end);
+	GU::Intersection inc = linesIntersection(ev1->seg->start, ev1->seg->end, ev2->seg->start, ev2->seg->end);
 
 	// 处理平行线
 	if (std::fabs(inc.cross) < 1e-10) {	
