@@ -257,9 +257,10 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 	else {
 		// 将ev1断开
 		if (inc.alongA >= 1e-10 && inc.alongA - 1 <= -1e-10) {
-			std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
 			if (inc.alongB > -1e-10 && inc.alongB < 1e-10) {
 				// 交点在A中间B起点 A:event line B:below
+				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
+				inc_count_++;
 				Segment* new_seg = new Segment(ev2->seg->start, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
 				//new_seg.otherFill = nullptr;
@@ -272,6 +273,8 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				eventAddSegment(new_seg, ev1->primary);
 			}
 			else if (inc.alongB >= 1e-10 && inc.alongB <= 1-1e-10) {
+				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
+				inc_count_++;
 				// 交点在A中间B中间，拆分事件线段，更新事件点other
 				Segment* new_seg = new Segment(inc.p, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
@@ -289,6 +292,8 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 			else if (inc.alongB > 1-1e-10 && inc.alongB <1+1e-10) {
 				// 交点在A中间B终点 A:event line B:above/below
+				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
+				inc_count_++;
 				Segment* new_seg = new Segment(ev2->seg->end, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
 				//new_seg.otherFill = nullptr;
@@ -588,4 +593,5 @@ void Intersecter::reset() {
 		delete node;
 	}
 	all_seg_node.clear();
+	inc_count_ = 0;
 }

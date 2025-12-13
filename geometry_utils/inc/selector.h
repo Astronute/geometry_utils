@@ -25,5 +25,12 @@ public:
             0, 1, 2, 0;
         return select;
     }
-
+    Eigen::Matrix4i difference2() {
+        Eigen::Matrix4i select;
+        select << 0, 0, 0, 0,
+            2, 0, 2, 0,
+            1, 1, 0, 0,
+            0, 0, 0, 0;
+        return select;
+    }
 };

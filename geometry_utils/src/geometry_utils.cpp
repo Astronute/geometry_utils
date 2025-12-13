@@ -187,7 +187,13 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
     }
 
     SegmentSelector selctor;
-    std::vector<Segment> sel_segments = selctor.select(selctor.difference(), res_C);
+    std::vector<Segment> sel_segments;
+    if (intersecter.inc_count_ > 0) {
+        sel_segments = selctor.select(selctor.difference(), res_C);
+    }
+    else {
+        sel_segments = selctor.select(selctor.difference2(), res_C);
+    }
     std::vector<std::deque<Eigen::Vector2d>> polygons = selctor.segmentChain(sel_segments);
     for (auto polygon : polygons) {
         std::vector<Eigen::Vector2d> polygon_vector(polygon.begin(), polygon.end());

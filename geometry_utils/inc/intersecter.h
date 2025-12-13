@@ -45,10 +45,14 @@ public:
 
 	EventList event_list = EventList();
 
+	int inc_count_;
+
 private:
 	std::vector<EventNode*> all_event_node;
 	std::vector<StatusNode*> all_status_node;
 	std::vector<Segment*> all_seg_node;
+
+	
 
 };
 
