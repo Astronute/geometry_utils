@@ -163,8 +163,23 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
     return res;
 }
 
-void GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
+bool GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
+    if ((pointInPolygon(lstart, polygon) == 1) || (pointInPolygon(lend, polygon) == 1)) {
+        return true;
+    }
 
+    int len = polygon.size();
+    Eigen::Vector2d v0, v = polygon[len - 1];
+    for (int i = 0; i < len; ++i) {
+        v0 = v;
+        v = polygon[i];
+        GU::Intersection inc = calc_linesIntersect(v0, v, lstart, lend);
+        if ((inc.alongA>1e-10&& inc.alongA<1-1e-10) && (inc.alongB > 1e-10 && inc.alongB < 1 - 1e-10)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void GeometryUtils::sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary) {
