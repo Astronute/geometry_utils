@@ -129,6 +129,44 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, GU::Node* root){
     return res;
 }
 
+double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon) {
+    double res = 0;
+    int counter = 0;
+    int len = polygon.size();
+
+    Eigen::Vector2d v0, v = polygon[len - 1];
+    for (int i = 0; i < polygon.size(); ++i) {
+        v0 = v;
+        v = polygon[i];
+        if ((v0(1) <= p(1) && v(1) <= p(1))||(v0(1) > p(1) && v(1) > p(1))||(v0(0)<p(0)&&v(0)<p(0))) {
+            if (p(1) == v(1) && (p(0) == v(0) || (p(1) == v0(1) &&
+                ((v0(0) <= p(0) && p(0) <= v(0)) || (v(0) <= p(0) && p(0) <= v0(0)))))) {
+                return 0;
+            }
+            continue;
+        }
+
+        Eigen::Vector2d v0_v = v - v0;
+        Eigen::Vector2d v0_p = p - v0;
+        double cross = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+        if (cross == 0) {
+            return 0;
+        }
+        if (v(1) < v0(1)) {
+            cross = -cross;
+        }
+        counter += cross > 0;
+    }
+
+    res = counter % 2 == 0 ? -1 : 1;
+
+    return res;
+}
+
+void GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
+
+}
+
 void GeometryUtils::sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary) {
     int len = boundary.size();
 
