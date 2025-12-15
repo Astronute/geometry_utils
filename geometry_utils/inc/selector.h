@@ -17,6 +17,7 @@ public:
 
     std::vector<std::deque<Eigen::Vector2d>> segmentChain(const std::vector<Segment>& segments);
 
+    // ring A - B
     Eigen::Matrix4i difference() {
         Eigen::Matrix4i select;
         select << 0, 0, 0, 0,
@@ -25,6 +26,7 @@ public:
             0, 1, 2, 0;
         return select;
     }
+    // ignore inner ring
     Eigen::Matrix4i difference2() {
         Eigen::Matrix4i select;
         select << 0, 0, 0, 0,
