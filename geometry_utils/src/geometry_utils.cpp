@@ -207,6 +207,12 @@ std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorTyp
     return dp_path;
 }
 
+template std::vector<Eigen::Vector2d>
+GeometryUtils::simplifyCurve<Eigen::Vector2d>(const std::vector<Eigen::Vector2d>& curve, double epsilon);
+
+template std::vector<Eigen::Vector2i>
+GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
+
 bool GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
     if ((pointInPolygon(lstart, polygon) == 1) || (pointInPolygon(lend, polygon) == 1)) {
         return true;
