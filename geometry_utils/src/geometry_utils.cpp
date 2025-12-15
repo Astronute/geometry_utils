@@ -163,6 +163,50 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
     return res;
 }
 
+template<typename VectorType>
+std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorType>& curve, double epsilon) {
+    // Douglas-Peuker
+    std::vector<VectorType> dp_path;
+    if (curve.size() < 3) {
+        return curve;
+    }
+
+    VectorType start = curve[0];
+    VectorType end = curve.back();
+    VectorType vec_line = end - start;
+    //if (vec_line.norm() < 1e-10) {
+    //    return { start };
+    //}
+
+    int index_target = 0;
+    bool get_index = false;
+    double max_l = 0.0;
+    for (int i = 1; i < curve.size() - 1; ++i) {
+        VectorType vec_sp = curve[i] - start;
+        double l = std::fabs(vec_sp(0) * vec_line(1) - vec_sp(1) * vec_line(0)) / vec_line.norm();
+        if (l >= max_l && l > epsilon) {
+            max_l = l;
+            index_target = i;
+            get_index = true;
+        }
+    }
+
+    if (get_index) {
+        std::vector<VectorType> left_segment(curve.begin(), curve.begin() + index_target + 1);
+        std::vector<VectorType> right_segment(curve.begin() + index_target, curve.end());
+        std::vector<VectorType> dp_path_l = simplifyCurve(left_segment, epsilon);
+        std::vector<VectorType> dp_path_r = simplifyCurve(right_segment, epsilon);
+
+        dp_path = dp_path_l;
+        dp_path.insert(dp_path.end(), dp_path_r.begin() + 1, dp_path_r.end());
+    }
+    else {
+        dp_path.push_back(start);
+        dp_path.push_back(end);
+    }
+    return dp_path;
+}
+
 bool GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
     if ((pointInPolygon(lstart, polygon) == 1) || (pointInPolygon(lend, polygon) == 1)) {
         return true;

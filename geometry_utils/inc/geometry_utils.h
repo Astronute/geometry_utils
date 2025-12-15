@@ -29,6 +29,9 @@ public:
 
     GU::Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
 
+    template<typename VectorType>
+    std::vector<VectorType> simplifyCurve(const std::vector<VectorType>& curve, double epsilon);
+
     bool calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon);
     
     void sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary);
