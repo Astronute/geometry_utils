@@ -54,17 +54,7 @@ void main() {
     }
 
     GeometryUtils GU;
-    
-    int t = 100000;
-    clock_t time_begin_cpu = clock();
-    cv::Point2d p = cv::Point(22.0138, 1.495);
-    while (t--) {
-        GU.pointInPolygon(22.0138, 1.495, fast_region, length, true);
-        //cv::pointPolygonTest(cv_region, p, true);
-    }
-    clock_t time_end_cpu111 = clock();
-    double planning_duration = (double)(time_end_cpu111 - time_begin_cpu) / CLOCKS_PER_SEC;
-    std::cout << "planning duration: " << planning_duration << std::endl;
+    std::cout << GU.pointInPolygon(22.0138, 1.4954, fast_region, length, true) << std::endl;
     //std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     //for (int i = 0; i < polygons.size(); ++i) {
     //    GU.sort_polygon_vertices_ccw(polygons[i]);
@@ -73,4 +63,5 @@ void main() {
     //    }
     //    std::cout << std::endl;
     //}
+    delete[] fast_region;
 }
