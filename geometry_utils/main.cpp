@@ -26,21 +26,16 @@ void main() {
     //                                   Eigen::Vector2d(1, 2)
     //};
 
-    std::vector<Eigen::Vector2d> region_0{ Eigen::Vector2d(31.2846, 13.5522),
-                                   Eigen::Vector2d(29.8729, 38.5123),
-                                   Eigen::Vector2d(21.7038, 42.0352),
-                                   Eigen::Vector2d(-6.06454,  24.6991),
-                                   Eigen::Vector2d(1.32079, 2.37531),
-                                   Eigen::Vector2d(23.9684, 7.83008),
-                                   Eigen::Vector2d(22.9373, -4.21442),
-                                   Eigen::Vector2d(39.7145, 9.91682)
+    std::vector<Eigen::Vector2d> region_0{ Eigen::Vector2d(16.366, 13.9891),
+                                   Eigen::Vector2d(16.2736, 13.7581),
+                                   Eigen::Vector2d(16.6533,  13.948)
     };
 
-    std::vector<Eigen::Vector2d> region_1{ Eigen::Vector2d(7.64842, 6.44218),
-                                           Eigen::Vector2d(15.5381, 15.7025),
-                                           Eigen::Vector2d(30.5937, 25.7687),
-                                           Eigen::Vector2d(15.9, 19.9297),
-                                           Eigen::Vector2d(16.5031,  26.975) };
+    std::vector<Eigen::Vector2d> region_1{ Eigen::Vector2d(6.80226, -1.03985),
+                                           Eigen::Vector2d(22.0138,  1.4954),
+                                           Eigen::Vector2d(44.6356, -1.01814),
+                                           Eigen::Vector2d(25.9256, 5.21851),
+                                           Eigen::Vector2d(32.5322, 11.8251) };
 
 
     GeometryUtils GU;

@@ -33,6 +33,7 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
     for (auto seg : segments) {
         Eigen::Vector2d seg_start = seg.start;
         Eigen::Vector2d seg_end = seg.end;
+        std::cout << "chain start: " << seg_start.transpose() << " -> " << seg_end.transpose() << std::endl;
         if ((seg_start - seg_end).norm() < 1e-10) {
             std::cout << " segmentChain error: zero-length segment detected " << std::endl;
             return polygons;
@@ -96,8 +97,8 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
             Eigen::Vector2d oppo = addToHead ? chains[index][chains[index].size() - 1] : chains[index][0];
             Eigen::Vector2d oppo2 = addToHead ? chains[index][chains[index].size() - 2] : chains[index][1];
 
-            Eigen::Vector2d vec_c = grow2 - grow;
-            Eigen::Vector2d vec_p = grow - pt;
+            Eigen::Vector2d vec_c = (grow2 - grow).normalized();
+            Eigen::Vector2d vec_p = (grow - pt).normalized();
             double cross1 = vec_c(0) * vec_p(1) - vec_c(1) * vec_p(0);
             std::cout << "cross : " << cross1 << std::endl;
             // 线段匹配点与链的头/尾共线，删除头尾点
@@ -112,8 +113,8 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
             }
             // 线段匹配点和链上匹配点的另一头相接(多边形闭合)
             if ((oppo - pt).norm() < 1e-10) {
-                Eigen::Vector2d vec_c = oppo2 - oppo;
-                Eigen::Vector2d vec_p = grow - oppo;
+                Eigen::Vector2d vec_c = (oppo2 - oppo).normalized();
+                Eigen::Vector2d vec_p = (grow - oppo).normalized();
                 double cross2 = vec_c(0) * vec_p(1) - vec_c(1) * vec_p(0);
                 if (std::fabs(cross2) < 1e-10) {
                     if (addToHead) {

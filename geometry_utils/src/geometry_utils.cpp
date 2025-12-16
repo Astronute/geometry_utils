@@ -299,8 +299,10 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
     }
     std::vector<std::deque<Eigen::Vector2d>> polygons = selctor.segmentChain(sel_segments);
     for (auto polygon : polygons) {
-        std::vector<Eigen::Vector2d> polygon_vector(polygon.begin(), polygon.end());
-        res.push_back(polygon_vector);
+        if (polygon.size() > 2) {
+            std::vector<Eigen::Vector2d> polygon_vector(polygon.begin(), polygon.end());
+            res.push_back(polygon_vector);
+        }
     }
 
     return res;
