@@ -167,23 +167,26 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
     else {
         for (int i = 0; i < len; ++i) {
 
-            double dist_num, dist_denom = 1;
+            double dx, dy, dx1, dy1, dx2, dy2, dist_num, dist_denom = 1;
             
             v0 = v;
             v = polygon[i];
-            Eigen::Vector2d v0_v = v - v0;
-            Eigen::Vector2d v0_p = p - v0;
-            Eigen::Vector2d v_p = p - v;
-            if (v0_p.dot(v0_v) <= 0) {
-                dist_num = v0_p.dot(v0_p);
+            dx = v(0) - v0(0);
+            dy = v(1) - v0(1);
+            dx1 = p(0) - v0(0);
+            dy1 = p(1) - v0(1);
+            dx2 = p(0) - v(0);
+            dy2 = p(1) - v(1);
+            if (dx1 * dx + dy1 * dy <= 0) {
+                dist_num = dx1 * dx1 + dy1 * dy1;
             }
-            else if (v_p.dot(v0_v) >= 0) {
-                dist_num = v_p.dot(v_p);
+            else if (dx2 * dx + dy2 * dy >= 0) {
+                dist_num = dx2 * dx2 + dy2 * dy2;
             }
             else {
-                dist_num = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+                dist_num = (dy1 * dx - dx1 * dy);
                 dist_num *= dist_num;
-                dist_denom = v0_v.dot(v0_v);
+                dist_denom = dx * dx + dy * dy;
             }
             if (dist_num * min_dist_denom < min_dist_num * dist_denom) {
                 min_dist_num = dist_num;
@@ -195,8 +198,8 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
             if ((v0(1) <= p(1) && v(1) <= p(1)) || (v0(1) > p(1) && v(1) > p(1)) || (v0(0) < p(0) && v(0) < p(0))) {
                 continue;
             }
-            dist_num = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
-            if (v0_v(1) < 0) {
+            dist_num = dy1 * dx - dx1 * dy;
+            if (dy < 0) {
                 dist_num = -dist_num;
             }
             counter += dist_num > 0;

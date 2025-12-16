@@ -39,7 +39,7 @@ void main() {
 
 
     GeometryUtils GU;
-    std::cout << GU.pointInPolygon(Eigen::Vector2d(22.0138, 2), region_1, true) << std::endl;
+    std::cout << GU.pointInPolygon(Eigen::Vector2d(22.0138, 1.495), region_1, true) << std::endl;
     //std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     //for (int i = 0; i < polygons.size(); ++i) {
     //    GU.sort_polygon_vertices_ccw(polygons[i]);
