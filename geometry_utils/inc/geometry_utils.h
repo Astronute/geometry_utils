@@ -2,6 +2,7 @@
 #define __GEOMETRY_UTILS_H__
 
 #include <iostream>
+#include <cfloat>
 #include <limits>
 #include <memory>
 #include <vector>

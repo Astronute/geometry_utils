@@ -134,7 +134,7 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
     int counter = 0;
     int len = polygon.size();
 
-    double min_dist_num = std::numeric_limits<double>::max();
+    double min_dist_num = FLT_MAX;
     double min_dist_denom = 1;
 
     Eigen::Vector2d v0, v = polygon[len - 1];
