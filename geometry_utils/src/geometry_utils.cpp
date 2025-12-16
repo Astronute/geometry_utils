@@ -291,7 +291,7 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
 
     SegmentSelector selctor;
     std::vector<Segment> sel_segments;
-    if (intersecter.inc_count_ > 0) {
+    if (intersecter.inc_count_ > 1) {
         sel_segments = selctor.select(selctor.difference(), res_C);
     }
     else {

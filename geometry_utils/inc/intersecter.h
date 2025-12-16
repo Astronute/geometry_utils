@@ -52,7 +52,7 @@ private:
 	std::vector<StatusNode*> all_status_node;
 	std::vector<Segment*> all_seg_node;
 
-	
+	double EPS = 1e-3;
 
 };
 

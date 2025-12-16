@@ -10,7 +10,7 @@ Intersecter::~Intersecter(){
 }
 
 bool Intersecter::pointsSame(const Eigen::Vector2d& a, const Eigen::Vector2d& b) {
-	return std::fabs(a(0) - b(0)) < 1e-10 && std::fabs(a(1) - b(1)) < 1e-10;
+	return std::fabs(a(0) - b(0)) < EPS && std::fabs(a(1) - b(1)) < EPS;
 }
 
 // 判断点p是否在线段left,right之间
@@ -19,12 +19,12 @@ bool Intersecter::pointBetween(const Eigen::Vector2d& p, const Eigen::Vector2d& 
 	Eigen::Vector2d vec = p - left;
 
 	double dot = line_vec.dot(vec);
-	if (dot < 1e-10) {
+	if (dot < EPS) {
 		return false;
 	}
 
 	double sqlen = line_vec.dot(line_vec);
-	if (dot - sqlen > -1e-10) {
+	if (dot - sqlen > -EPS) {
 		return false;
 	}
 	return true;
@@ -32,8 +32,8 @@ bool Intersecter::pointBetween(const Eigen::Vector2d& p, const Eigen::Vector2d& 
 
 // 0:相等 -1:p1在p2之前 1:p1在p2之后
 int Intersecter::pointsCompare(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2) {
-	if (std::fabs(p1(0) - p2(0)) < 1e-10) {
-		return std::fabs(p1(1) - p2(1)) < 1e-10 ? 0 : p1(1) < p2(1) ? -1 : 1;
+	if (std::fabs(p1(0) - p2(0)) < EPS) {
+		return std::fabs(p1(1) - p2(1)) < EPS ? 0 : p1(1) < p2(1) ? -1 : 1;
 	}
 	return p1(0) < p2(0) ? -1 : 1;
 }
@@ -83,8 +83,8 @@ int Intersecter::statusCompare(EventNode* ev1, EventNode* ev2) {
 	Eigen::Vector2d vec_se = ev1->seg->end - ev2->seg->start;
 	double cross1 = ev2_vec(0) * vec_ss(1) - ev2_vec(1) * vec_ss(0);
 	double cross2 = ev2_vec(0) * vec_se(1) - ev2_vec(1) * vec_se(0);
-	if (std::fabs(cross1) < 1e-10) { // 共线
-		if (std::fabs(cross2) < 1e-10) {
+	if (std::fabs(cross1) < EPS) { // 共线
+		if (std::fabs(cross2) < EPS) {
 			return 1;
 		}
 	}
@@ -122,7 +122,7 @@ GU::Intersection Intersecter::linesIntersection(const Eigen::Vector2d& a0, const
 	GU::Intersection inc;
 	double cross_ab = A_vec(0) * B_vec(1) - A_vec(1) * B_vec(0);
 	inc.cross = cross_ab;
-	if (std::fabs(cross_ab) < 1e-10) {
+	if (std::fabs(cross_ab) < EPS) {
 		return inc;
 	}
 	Eigen::Matrix2d A(2, 2);
@@ -148,12 +148,12 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 	GU::Intersection inc = linesIntersection(ev1->seg->start, ev1->seg->end, ev2->seg->start, ev2->seg->end);
 
 	// 处理平行线
-	if (std::fabs(inc.cross) < 1e-10) {	
+	if (std::fabs(inc.cross) < EPS) {
 		Eigen::Vector2d ev1_seg_vec = ev1->seg->end - ev1->seg->start;
 		Eigen::Vector2d vec = ev1->seg->end - ev2->seg->start;
 		double cross = ev1_seg_vec(0) * vec(1) - ev1_seg_vec(1) * vec(0);
 		// 平行不共线
-		if (!(std::fabs(cross) < 1e-10)) { 
+		if (!(std::fabs(cross) < EPS)) {
 			return nullptr;
 		}
 		// 共线首位相接
@@ -256,8 +256,8 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 	}
 	else {
 		// 将ev1断开
-		if (inc.alongA >= 1e-10 && inc.alongA - 1 <= -1e-10) {
-			if (inc.alongB > -1e-10 && inc.alongB < 1e-10) {
+		if (inc.alongA >= EPS && inc.alongA - 1 <= -EPS) {
+			if (inc.alongB > -EPS && inc.alongB < EPS) {
 				// 交点在A中间B起点 A:event line B:below
 				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
 				inc_count_++;
@@ -272,7 +272,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				eventAdd(event_list.root, ev1->other, ev1->pos);
 				eventAddSegment(new_seg, ev1->primary);
 			}
-			else if (inc.alongB >= 1e-10 && inc.alongB <= 1-1e-10) {
+			else if (inc.alongB >= EPS && inc.alongB <= 1- EPS) {
 				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
 				inc_count_++;
 				// 交点在A中间B中间，拆分事件线段，更新事件点other
@@ -290,7 +290,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				// 新建多余线段事件
 				eventAddSegment(new_seg, ev1->primary);
 			}
-			else if (inc.alongB > 1-1e-10 && inc.alongB <1+1e-10) {
+			else if (inc.alongB > 1- EPS && inc.alongB <1+ EPS) {
 				// 交点在A中间B终点 A:event line B:above/below
 				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
 				inc_count_++;
@@ -307,8 +307,8 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 		}
 		// 将B断开
-		if (inc.alongB >= 1e-10 && inc.alongB - 1 < -1e-10) {
-			if (inc.alongA > -1e-10 && inc.alongA < 1e-10) {
+		if (inc.alongB >= EPS && inc.alongB - 1 < -EPS) {
+			if (inc.alongA > -EPS && inc.alongA < EPS) {
 				// 交点在B中间A的起点 A:event B:above
 				Segment* new_seg = new Segment(ev1->seg->start, ev2->seg->end);
 				new_seg->myFill = ev2->seg->myFill;
@@ -321,7 +321,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				eventAdd(event_list.root, ev2->other, ev2->pos);
 				eventAddSegment(new_seg, ev2->primary);
 			}
-			else if (inc.alongA >= 1e-10 && inc.alongA <= 1-1e-10) {
+			else if (inc.alongA >= EPS && inc.alongA <= 1- EPS) {
 				// 交点在B中间A中间 拆分状态线段，更新状态线段other事件点，新增事件线段
 				Segment* new_seg = new Segment(inc.p, ev2->seg->end);
 				new_seg->myFill = ev2->seg->myFill;
@@ -334,7 +334,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				eventAdd(event_list.root, ev2->other, ev2->pos);
 				eventAddSegment(new_seg, ev2->primary);
 			}
-			else if (inc.alongA > 1-1e-10 && inc.alongA < 1+1e-10) {
+			else if (inc.alongA > 1- EPS && inc.alongA < 1+ EPS) {
 				// 交点在B中间A的终点 A:event B:above/below
 				Segment* new_seg = new Segment(ev1->seg->end, ev2->seg->end);
 				new_seg->myFill = ev2->seg->myFill;
