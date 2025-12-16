@@ -9,7 +9,10 @@
 #include <algorithm>
 #include "geometry_utils.h"
 //#include "intersecter.h"
-
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/videoio.hpp"
 
 
 void main() {
@@ -37,9 +40,31 @@ void main() {
                                            Eigen::Vector2d(25.9256, 5.21851),
                                            Eigen::Vector2d(32.5322, 11.8251) };
 
+    std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
+                                        cv::Point(22.0138,  1.4954),
+                                        cv::Point(44.6356, -1.01814),
+                                        cv::Point(25.9256, 5.21851),
+                                        cv::Point(32.5322, 11.8251) };
+
+    int length = 2 * region_1.size();
+    double* fast_region = new double[length];
+    for (int i = 0; i < region_1.size(); ++i) {
+        fast_region[2 * i] = region_1[i](0);
+        fast_region[2 * i + 1] = region_1[i](1);
+    }
 
     GeometryUtils GU;
-    std::cout << GU.pointInPolygon(Eigen::Vector2d(22.0138, 1.495), region_1, true) << std::endl;
+    
+    int t = 100000;
+    clock_t time_begin_cpu = clock();
+    cv::Point2d p = cv::Point(22.0138, 1.495);
+    while (t--) {
+        GU.pointInPolygon(22.0138, 1.495, fast_region, length, true);
+        //cv::pointPolygonTest(cv_region, p, true);
+    }
+    clock_t time_end_cpu111 = clock();
+    double planning_duration = (double)(time_end_cpu111 - time_begin_cpu) / CLOCKS_PER_SEC;
+    std::cout << "planning duration: " << planning_duration << std::endl;
     //std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     //for (int i = 0; i < polygons.size(); ++i) {
     //    GU.sort_polygon_vertices_ccw(polygons[i]);

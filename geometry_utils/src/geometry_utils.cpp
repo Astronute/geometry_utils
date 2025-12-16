@@ -213,6 +213,93 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
     return res;
 }
 
+double GeometryUtils::pointInPolygon(const int x, const int y, const double* polygon, int length, bool measureDist) {
+    double res = 0;
+    int counter = 0;
+    int len = length / 2;
+
+    double min_dist_num = FLT_MAX;
+    double min_dist_denom = 1;
+
+    double v0_x, v_x = polygon[length - 2];
+    double v0_y, v_y = polygon[length - 1];
+
+    if (!measureDist) {
+        //for (int i = 0; i < len; ++i) {
+        //    v0 = v;
+        //    v = polygon[i];
+        //    if ((v0(1) <= y && v(1) <= y) || (v0(1) > y && v(1) > y) || (v0(0) < x && v(0) < x)) {
+        //        if (y == v(1) && (x == v(0) || (y == v0(1) &&
+        //            ((v0(0) <= x && x <= v(0)) || (v(0) <= x && x <= v0(0)))))) {
+        //            return 0;
+        //        }
+        //        continue;
+        //    }
+
+        //    Eigen::Vector2d v0_v = v - v0;
+        //    Eigen::Vector2d v0_p = p - v0;
+        //    double cross = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+        //    if (cross == 0) {
+        //        return 0;
+        //    }
+        //    if (v(1) < v0(1)) {
+        //        cross = -cross;
+        //    }
+        //    counter += cross > 0;
+        //}
+        //res = counter % 2 == 0 ? -1 : 1;
+    }
+    else {
+        for (int i = 0; i < len; ++i) {
+
+            double dx, dy, dx1, dy1, dx2, dy2, dist_num, dist_denom = 1;
+
+            v0_x = v_x;
+            v0_y = v_y;
+            v_x = polygon[i * 2];
+            v_y = polygon[i * 2 + 1];
+            dx = v_x - v0_x;
+            dy = v_y - v0_y;
+            dx1 = x - v0_x;
+            dy1 = y - v0_y;
+            dx2 = x - v_x;
+            dy2 = y - v_y;
+            if (dx1 * dx + dy1 * dy <= 0) {
+                dist_num = dx1 * dx1 + dy1 * dy1;
+            }
+            else if (dx2 * dx + dy2 * dy >= 0) {
+                dist_num = dx2 * dx2 + dy2 * dy2;
+            }
+            else {
+                dist_num = (dy1 * dx - dx1 * dy);
+                dist_num *= dist_num;
+                dist_denom = dx * dx + dy * dy;
+            }
+            if (dist_num * min_dist_denom < min_dist_num * dist_denom) {
+                min_dist_num = dist_num;
+                min_dist_denom = dist_denom;
+                if (min_dist_num == 0) {
+                    break;
+                }
+            }
+            if ((v0_y <= y && v_y <= y) || (v0_y > y && v_y > y) || (v0_x < x && v_x < x)) {
+                continue;
+            }
+            dist_num = dy1 * dx - dx1 * dy;
+            if (dy < 0) {
+                dist_num = -dist_num;
+            }
+            counter += dist_num > 0;
+        }
+        res = std::sqrt(min_dist_num / min_dist_denom);
+        if (counter % 2 == 0) {
+            res = -res;
+        }
+    }
+
+    return res;
+}
+
 template<typename VectorType>
 std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorType>& curve, double epsilon) {
     // Douglas-Peuker
