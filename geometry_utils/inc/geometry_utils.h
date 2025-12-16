@@ -25,7 +25,7 @@ public:
 
     double pointInPolygon(const Eigen::Vector2d& p, GU::Node* root);
 
-    double pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon);
+    double pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon, bool measureDist);
 
     GU::Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
 

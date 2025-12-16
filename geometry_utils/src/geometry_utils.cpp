@@ -129,36 +129,83 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, GU::Node* root){
     return res;
 }
 
-double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon) {
+double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon, bool measureDist) {
     double res = 0;
     int counter = 0;
     int len = polygon.size();
 
+    double min_dist_num = std::numeric_limits<double>::max();
+    double min_dist_denom = 1;
+
     Eigen::Vector2d v0, v = polygon[len - 1];
-    for (int i = 0; i < polygon.size(); ++i) {
-        v0 = v;
-        v = polygon[i];
-        if ((v0(1) <= p(1) && v(1) <= p(1))||(v0(1) > p(1) && v(1) > p(1))||(v0(0)<p(0)&&v(0)<p(0))) {
-            if (p(1) == v(1) && (p(0) == v(0) || (p(1) == v0(1) &&
-                ((v0(0) <= p(0) && p(0) <= v(0)) || (v(0) <= p(0) && p(0) <= v0(0)))))) {
+
+    if (!measureDist) {
+        for (int i = 0; i < len; ++i) {
+            v0 = v;
+            v = polygon[i];
+            if ((v0(1) <= p(1) && v(1) <= p(1)) || (v0(1) > p(1) && v(1) > p(1)) || (v0(0) < p(0) && v(0) < p(0))) {
+                if (p(1) == v(1) && (p(0) == v(0) || (p(1) == v0(1) &&
+                    ((v0(0) <= p(0) && p(0) <= v(0)) || (v(0) <= p(0) && p(0) <= v0(0)))))) {
+                    return 0;
+                }
+                continue;
+            }
+
+            Eigen::Vector2d v0_v = v - v0;
+            Eigen::Vector2d v0_p = p - v0;
+            double cross = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+            if (cross == 0) {
                 return 0;
             }
-            continue;
+            if (v(1) < v0(1)) {
+                cross = -cross;
+            }
+            counter += cross > 0;
         }
-
-        Eigen::Vector2d v0_v = v - v0;
-        Eigen::Vector2d v0_p = p - v0;
-        double cross = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
-        if (cross == 0) {
-            return 0;
-        }
-        if (v(1) < v0(1)) {
-            cross = -cross;
-        }
-        counter += cross > 0;
+        res = counter % 2 == 0 ? -1 : 1;
     }
+    else {
+        for (int i = 0; i < len; ++i) {
 
-    res = counter % 2 == 0 ? -1 : 1;
+            double dist_num, dist_denom = 1;
+            
+            v0 = v;
+            v = polygon[i];
+            Eigen::Vector2d v0_v = v - v0;
+            Eigen::Vector2d v0_p = p - v0;
+            Eigen::Vector2d v_p = p - v;
+            if (v0_p.dot(v0_v) <= 0) {
+                dist_num = v0_p.dot(v0_p);
+            }
+            else if (v_p.dot(v0_v) >= 0) {
+                dist_num = v_p.dot(v_p);
+            }
+            else {
+                dist_num = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+                dist_num *= dist_num;
+                dist_denom = v0_v.dot(v0_v);
+            }
+            if (dist_num * min_dist_denom < min_dist_num * dist_denom) {
+                min_dist_num = dist_num;
+                min_dist_denom = dist_denom;
+                if (min_dist_num == 0) {
+                    break;
+                }
+            }
+            if ((v0(1) <= p(1) && v(1) <= p(1)) || (v0(1) > p(1) && v(1) > p(1)) || (v0(0) < p(0) && v(0) < p(0))) {
+                continue;
+            }
+            dist_num = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+            if (v0_v(1) < 0) {
+                dist_num = -dist_num;
+            }
+            counter += dist_num > 0;
+        }
+        res = std::sqrt(min_dist_num / min_dist_denom);
+        if (counter % 2 == 0) {
+            res = -res;
+        }
+    }
 
     return res;
 }
@@ -214,7 +261,7 @@ template std::vector<Eigen::Vector2i>
 GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
 
 bool GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
-    if ((pointInPolygon(lstart, polygon) == 1) || (pointInPolygon(lend, polygon) == 1)) {
+    if ((pointInPolygon(lstart, polygon, false) == 1) || (pointInPolygon(lend, polygon, false) == 1)) {
         return true;
     }
 

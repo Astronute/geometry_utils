@@ -33,7 +33,6 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
     for (auto seg : segments) {
         Eigen::Vector2d seg_start = seg.start;
         Eigen::Vector2d seg_end = seg.end;
-        std::cout << "chain start: " << seg_start.transpose() << " -> " << seg_end.transpose() << std::endl;
         if ((seg_start - seg_end).norm() < 1e-10) {
             std::cout << " segmentChain error: zero-length segment detected " << std::endl;
             return polygons;
