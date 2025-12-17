@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <limits>
+#include <cfloat>
+#include <cmath>
 
 namespace GU {
     struct Point {

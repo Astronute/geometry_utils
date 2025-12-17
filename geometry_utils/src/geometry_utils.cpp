@@ -350,17 +350,20 @@ double GeometryUtils::pointInPolygon(const double x, const double y, const doubl
     return res;
 }
 
-template<typename VectorType>
-std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorType>& curve, double epsilon) {
+std::vector<GU::Point> GeometryUtils::simplifyCurve(const std::vector<GU::Point>& curve, double epsilon) {
     // Douglas-Peuker
-    std::vector<VectorType> dp_path;
+    std::vector<GU::Point> dp_path;
     if (curve.size() < 3) {
         return curve;
     }
 
-    VectorType start = curve[0];
-    VectorType end = curve.back();
-    VectorType vec_line = end - start;
+    GU::Point start = curve[0];
+    GU::Point end = curve.back();
+    double dx1, dy1, norm1;
+    // vec_line(dx1, dy1)
+    dx1 = end.x - start.x;
+    dy1 = end.y - start.y;
+    norm1 = std::sqrt(dx1* dx1+ dy1* dy1);
     //if (vec_line.norm() < 1e-10) {
     //    return { start };
     //}
@@ -369,8 +372,11 @@ std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorTyp
     bool get_index = false;
     double max_l = 0.0;
     for (int i = 1; i < curve.size() - 1; ++i) {
-        VectorType vec_sp = curve[i] - start;
-        double l = std::fabs(vec_sp(0) * vec_line(1) - vec_sp(1) * vec_line(0)) / vec_line.norm();
+        double dx2, dy2;
+        // vec_sp(dx2, dy2)
+        dx2 = curve[i].x - start.x;
+        dy2 = curve[i].y - start.y;
+        double l = std::fabs(dx2 * dy1 - dy2 * dx1) / norm1;
         if (l >= max_l && l > epsilon) {
             max_l = l;
             index_target = i;
@@ -379,10 +385,10 @@ std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorTyp
     }
 
     if (get_index) {
-        std::vector<VectorType> left_segment(curve.begin(), curve.begin() + index_target + 1);
-        std::vector<VectorType> right_segment(curve.begin() + index_target, curve.end());
-        std::vector<VectorType> dp_path_l = simplifyCurve(left_segment, epsilon);
-        std::vector<VectorType> dp_path_r = simplifyCurve(right_segment, epsilon);
+        std::vector<GU::Point> left_segment(curve.begin(), curve.begin() + index_target + 1);
+        std::vector<GU::Point> right_segment(curve.begin() + index_target, curve.end());
+        std::vector<GU::Point> dp_path_l = simplifyCurve(left_segment, epsilon);
+        std::vector<GU::Point> dp_path_r = simplifyCurve(right_segment, epsilon);
 
         dp_path = dp_path_l;
         dp_path.insert(dp_path.end(), dp_path_r.begin() + 1, dp_path_r.end());
