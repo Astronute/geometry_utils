@@ -2,6 +2,8 @@
 
 #include "vector"
 #include "deque"
+#include "cmath"
+#include <cfloat>
 #include "geometry_types.h"
 #include "linked_list.h"
 #include "Eigen/Dense"
@@ -15,7 +17,7 @@ public:
 
     std::vector<Segment> select(const Eigen::Matrix4i& selector, std::vector<Segment*> segments);
 
-    std::vector<std::deque<Eigen::Vector2d>> segmentChain(const std::vector<Segment>& segments);
+    std::vector<std::deque<GU::Point>> segmentChain(const std::vector<Segment>& segments);
 
     // ring A - B
     Eigen::Matrix4i difference() {

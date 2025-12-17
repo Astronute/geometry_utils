@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include "Eigen/Dense"
 #include "linked_list.h"
 #include "geometry_types.h"
 
@@ -13,15 +12,13 @@ public:
 	Intersecter();
 	~Intersecter();
 
-	bool pointsSame(const Eigen::Vector2d& a, const Eigen::Vector2d& b);
+	bool pointsSame(const GU::Point& a, const GU::Point& b);
 
-	bool pointBetween(const Eigen::Vector2d& p, const Eigen::Vector2d& left, const Eigen::Vector2d& right);
+	bool pointBetween(const GU::Point& p, const GU::Point& left, const GU::Point& right);
 
-	int pointsCollinear(const Eigen::Vector2d& a, const Eigen::Vector2d& b);
+	int pointsCompare(const GU::Point& p1, const GU::Point& p2);
 
-	int pointsCompare(const Eigen::Vector2d &p1, const Eigen::Vector2d &p2);
-
-	int eventsCompare(const bool& p1_isstart, const Eigen::Vector2d& p1_0, const Eigen::Vector2d& p1_1, const bool& p2_isstart, const Eigen::Vector2d& p2_0, const Eigen::Vector2d& p2_1);
+	int eventsCompare(const bool& p1_isstart, const GU::Point& p1_0, const GU::Point& p1_1, const bool& p2_isstart, const GU::Point& p2_0, const GU::Point& p2_1);
 
 	int statusCompare(EventNode* ev1, EventNode* ev2);
 
@@ -29,15 +26,13 @@ public:
 
 	EventNode* checkBothIntersections(EventNode* ev, EventNode* above, EventNode* below);
 
-	GU::Intersection linesIntersection(const Eigen::Vector2d& a0, const Eigen::Vector2d& a1, const Eigen::Vector2d& b0, const Eigen::Vector2d& b1);
+	GU::Intersection linesIntersection(const GU::Point& a0, const GU::Point& a1, const GU::Point& b0, const GU::Point& b1);
 
-	void addRegion(const std::vector<Eigen::Vector2d> &region, const bool& primary);
+	void addRegion(const std::vector<GU::Point> &region, const bool& primary);
 
-	void eventAdd(EventNode* const root, EventNode* const node, const Eigen::Vector2d other_pt);
+	void eventAdd(EventNode* const root, EventNode* const node, const GU::Point other_pt);
 
 	void eventAddSegment(Segment* const seg, const bool &primary);
-
-	std::vector<Eigen::Vector2d> calc_intersections();
 
 	std::vector<Segment*> calculate(const bool& selfIntersection);
 

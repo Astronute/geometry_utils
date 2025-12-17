@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <memory>
-#include "Eigen/Dense"
+#include "geometry_types.h"
 
 struct EventNode;
 struct StatusNode;
@@ -21,20 +21,20 @@ struct FillInfo {
 
 struct Segment {
 	int id;
-	Eigen::Vector2d start, end;
+	GU::Point start, end;
 	FillInfo myFill; // 当前多边形的填充状态
 	FillInfo otherFill; // 另一个多边形的填充状态
 
 	Segment() {}
 
-	Segment(Eigen::Vector2d s, Eigen::Vector2d e): start(s), end(e){
+	Segment(GU::Point s, GU::Point e): start(s), end(e){
 	}
 };
 
 struct EventNode {
 	bool isStart; // 是否为起点
 	bool primary; // true:主多边形 false:次多边形
-	Eigen::Vector2d pos; // 坐标
+	GU::Point pos; // 坐标
 	Segment* seg = nullptr; // 对应线段
 	EventNode* other = nullptr; // 所在线段的另一个(事件点/端点)
 	EventNode* prev = nullptr;

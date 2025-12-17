@@ -1,6 +1,5 @@
 #include "geometry_utils.h"
 
-
 std::string FillInfoToString(const FillState& seg) {
     switch (seg) {
     case FillState::Unknown: return "Unknown";
@@ -25,7 +24,7 @@ GeometryUtils::~GeometryUtils() {
     all_segment_ptr_.clear();
 }
 
-GU::Node* GeometryUtils::upgradePolygon(const std::vector<Eigen::Vector2d> &p){
+GU::Node* GeometryUtils::upgradePolygon(const std::vector<GU::Point> &p){
     GU::Node* root = nullptr;
     for(int i=0; i<p.size(); ++i){
         GU::Node* node = new GU::Node();
@@ -51,7 +50,7 @@ GU::Node* GeometryUtils::upgradePolygon(const std::vector<Eigen::Vector2d> &p){
 void GeometryUtils::printPolygon(GU::Node* root) {
     GU::Node* p = root;
     do {
-        std::cout << p->p.transpose() << std::endl;
+        std::cout << p->p << std::endl;
         p = p->next;
     } while (p!=root);
 }
@@ -81,8 +80,7 @@ GU::Intersection GeometryUtils::calc_linesIntersect(const GU::Line& lineA, const
     Eigen::Vector2d C = A.partialPivLu().solve(B); // colPivHouseholderQr()
     inc.alongA = C(0);
     inc.alongB = C(1);
-    inc.p << lineA.startX + inc.alongA * dx1,
-        lineA.startY + inc.alongA * dy1;
+    inc.p = GU::Point(lineA.startX + inc.alongA * dx1, lineA.startY + inc.alongA * dy1);
 
     return inc;
 }
@@ -98,7 +96,7 @@ GU::Node* GeometryUtils::nextNonIntersection(GU::Node* n){
 }
 
 
-double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, GU::Node* root){
+double GeometryUtils::pointInPolygon(const GU::Point&p, GU::Node* root){
     double res = 0;
     int counter = 0;
     GU::Node* Pcur = root;
@@ -114,8 +112,8 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, GU::Node* root){
             Pcur = Pnext;
             continue;
         }
-        Eigen::Vector2d v0_v1 = Pnext->p - Pcur->p;
-        Eigen::Vector2d v0_p = p - Pcur->p;
+        GU::Point v0_v1 = GU::Point(Pnext->p.x - Pcur->p.x, Pnext->p.y - Pcur->p.y);
+        GU::Point v0_p = GU::Point(p.x - Pcur->p.x, p.y - Pcur->p.y);
         double cross = v0_v1(0)*v0_p(1) - v0_v1(1)*v0_p(0);
         if(cross==0){
             return 0;
@@ -385,7 +383,7 @@ bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vec
     return false;
 }
 
-void GeometryUtils::sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary) {
+void GeometryUtils::sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary) {
     int len = boundary.size();
 
     double Sx2 = 0.0;
@@ -398,22 +396,22 @@ void GeometryUtils::sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boun
 
 }
 
-std::vector<Eigen::Vector2d> GeometryUtils::inflatePolygon(const std::vector<Eigen::Vector2d>& boundary, const double offset) {
-    std::vector<Eigen::Vector2d> valid_point;
+std::vector<GU::Point> GeometryUtils::inflatePolygon(const std::vector<GU::Vector2d>& boundary, const double offset) {
+    std::vector<GU::Point> valid_point;
     // 计算顶点偏移
     int N = boundary.size();
-    std::vector<Eigen::Vector2d> off_points;
+    std::vector<GU::Vector2d> off_points;
     for (int i = 0; i < N; ++i) {
-        Eigen::Vector2d left_evec = (boundary[((i - 1) + N) % N] - boundary[i]).normalized();
-        Eigen::Vector2d right_evec = (boundary[(i + 1) % N] - boundary[i]).normalized();
+        GU::Vector2d left_evec = (boundary[((i - 1) + N) % N] - boundary[i]).normalized();
+        GU::Vector2d right_evec = (boundary[(i + 1) % N] - boundary[i]).normalized();
         double cos_theta = left_evec.dot(right_evec);
         double half_sin_theta = std::sqrt((1 - cos_theta) / 2.0);
-        Eigen::Vector2d offset_pos = (left_evec + right_evec).normalized() * (offset / half_sin_theta) + boundary[i];
-        Eigen::Vector2d left_rvec = (boundary[i] - boundary[((i - 1) + N) % N]).normalized();
-        Eigen::Vector2d right_rvec = (boundary[(i + 1) % N] - boundary[i]).normalized();
+        GU::Vector2d offset_pos = (left_evec + right_evec).normalized() * (offset / half_sin_theta) + boundary[i];
+        GU::Vector2d left_rvec = (boundary[i] - boundary[((i - 1) + N) % N]).normalized();
+        GU::Vector2d right_rvec = (boundary[(i + 1) % N] - boundary[i]).normalized();
         double cross_product = left_rvec(0) * right_rvec(1) - left_rvec(1) * right_rvec(0);
         if (cross_product < 0) {
-            offset_pos = (left_evec + right_evec).normalized() * (-1.0 * offset / half_sin_theta) + boundary[i];
+            offset_pos = (left_evec + right_evec).normalized() * (-1.0 * offset / half_sin_theta) + GU::Vector2d(boundary[i].x, boundary[i].y);
         }
         off_points.push_back(offset_pos);
 
@@ -424,8 +422,8 @@ std::vector<Eigen::Vector2d> GeometryUtils::inflatePolygon(const std::vector<Eig
     std::vector<bool> invalid_edge_mask(N, false);
     int invalid_count = 0;
     for (int i = 0; i < off_points.size(); ++i) {
-        Eigen::Vector2d ori_vec = (boundary[(i + 1) % N] - boundary[i]).normalized();
-        Eigen::Vector2d off_vec = (off_points[(i + 1) % N] - off_points[i]).normalized();
+        GU::Vector2d ori_vec = (boundary[(i + 1) % N] - boundary[i]).normalized();
+        GU::Vector2d off_vec = (off_points[(i + 1) % N] - off_points[i]).normalized();
         double dot_vec = ori_vec.dot(off_vec);
         if (dot_vec < 0) {
             invalid_edge_mask[i] = true;
@@ -438,25 +436,80 @@ std::vector<Eigen::Vector2d> GeometryUtils::inflatePolygon(const std::vector<Eig
         return valid_point;
     }
 
-    //// 处理无效边 情况1
-    //for (int i = 0; i < invalid_edge_mask.size(); ++i) {
-    //    GU::Line invalid_edge;
-    //    if (invalid_edge_mask[i] && !invalid_edge_mask[((i - 1) + N) % N] && !invalid_edge_mask[(i + 1) % N]) {
-    //        std::cout << " process case1: " << std::endl;
-    //        Eigen::Vector2d inc;
-    //        off_edges[((i - 1) + N) % N].calc_intersection(off_edges[(i + 1) % N], inc);
-    //        off_edges[((i - 1) + N) % N] = SPline2D(off_edges[((i - 1) + N) % N].start_point, inc);
-    //        off_edges[(i + 1) % N] = SPline2D(inc, off_edges[(i + 1) % N].end_point);
+    // 处理无效边 情况1
+    for (int i = 0; i < invalid_edge_mask.size(); ++i) {
+        GU::Line invalid_edge;
+        if (invalid_edge_mask[i] && !invalid_edge_mask[((i - 1) + N) % N] && !invalid_edge_mask[(i + 1) % N]) {
+            std::cout << " process case1: " << std::endl;
+            GU::Intersection inc = calc_linesIntersect(off_edges[((i - 1) + N) % N], off_edges[(i + 1) % N]);
+            off_edges[((i - 1) + N) % N] = GU::Line(off_edges[((i - 1) + N) % N].startX, off_edges[((i - 1) + N) % N].startY, inc.p.x, inc.p.y);
+            off_edges[(i + 1) % N] = GU::Line(inc.p.x, inc.p.y, off_edges[(i + 1) % N].endX, off_edges[(i + 1) % N].endY);
+        }
+    }
+
+    //// 处理无效边 情况2
+    //{
+    //    int mask_len = invalid_edge_mask.size();
+    //    std::vector<bool> visited(mask_len, false);
+    //    for (int i = 0; i < invalid_edge_mask.size(); ++i) {
+    //        std::set<int> invalid_index;
+    //        if (!invalid_edge_mask[i]) {
+    //            valid_point.push_back(off_edges[i].start_point);
+    //        }
+    //        if (invalid_edge_mask[i] && !visited[i]) {
+    //            visited[i] = true;
+    //            invalid_index.insert(i);
+    //            int left = i - 1;
+    //            int l_index = (left + mask_len) % mask_len;
+    //            while (invalid_edge_mask[l_index]) {
+    //                visited[l_index] = true;
+    //                invalid_index.insert(l_index);
+    //                l_index = (--left + mask_len) % mask_len;
+    //            }
+
+    //            int right = i + 1;
+    //            int r_index = right % mask_len;
+    //            while (invalid_edge_mask[r_index]) {
+    //                if (invalid_edge_mask[r_index]) {
+    //                    visited[r_index] = true;
+    //                    invalid_index.insert(r_index);
+    //                    r_index = (++right) % mask_len;
+    //                }
+    //            }
+
+    //            if (invalid_index.size() > 1) {
+    //                std::cout << " process case2, num: " << invalid_index.size() << std::endl;
+    //                for (int idx : invalid_index) {
+    //                    // 计算无效边偏移
+    //                    Eigen::Vector2d p0_vec = boundary[idx];
+    //                    Eigen::Vector2d p1_vec = boundary[(idx + 1) % N];
+    //                    Eigen::Vector2d T_vec = (p1_vec - p0_vec).normalized();
+    //                    Eigen::Vector2d N_vec = Eigen::Vector2d(-1.0 * T_vec(1), T_vec(0)).normalized();
+    //                    Eigen::Vector2d new_p0_vec = p0_vec + offset * N_vec;
+    //                    Eigen::Vector2d new_p1_vec = p1_vec + offset * N_vec;
+    //                    SPline2D new_off_line = SPline2D(new_p0_vec, new_p1_vec);
+    //                    // 计算与左右有效边的交点
+    //                    Eigen::Vector2d left_inc, right_inc;
+    //                    if (new_off_line.is_intersecting(off_edges[l_index])) {
+    //                        new_off_line.calc_intersection(off_edges[l_index], left_inc);
+    //                        off_edges[l_index] = SPline2D(off_edges[l_index].start_point, left_inc);
+    //                    }
+    //                    if (new_off_line.is_intersecting(off_edges[r_index])) {
+    //                        new_off_line.calc_intersection(off_edges[r_index], right_inc);
+    //                        off_edges[r_index] = SPline2D(right_inc, off_edges[r_index].end_point);
+    //                    }
+    //                }
+    //                valid_point.push_back(off_edges[l_index].end_point);
+    //            }
+    //        }
     //    }
     //}
-
-
 
     return valid_point;
 }
 
-std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::vector<Eigen::Vector2d>& region_0, const std::vector<Eigen::Vector2d>& region_1) {
-    std::vector<std::vector<Eigen::Vector2d>> res;
+std::vector<std::vector<GU::Point>> GeometryUtils::calc_AnotB(const std::vector<GU::Point>& region_0, const std::vector<GU::Point>& region_1) {
+    std::vector<std::vector<GU::Point>> res;
 
     Intersecter intersecter;
     std::vector<Segment*> seg_primary, seg_secondary;
@@ -469,7 +522,7 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
         seg->otherFill = s->otherFill;
         seg_primary.push_back(seg);
         all_segment_ptr_.push_back(seg);
-        std::cout << "seg:" << s->start.transpose() << " -> " << s->end.transpose() <<
+        std::cout << "seg:" << s->start << " -> " << s->end <<
             " my:" << FillInfoToString(s->myFill.above) << ", " << FillInfoToString(s->myFill.below) << std::endl;
     }
     intersecter.reset();
@@ -483,7 +536,7 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
         seg->otherFill = s->otherFill;
         seg_secondary.push_back(seg);
         all_segment_ptr_.push_back(seg);
-        std::cout << "seg:" << s->start.transpose() << " -> " << s->end.transpose() <<
+        std::cout << "seg:" << s->start << " -> " << s->end <<
             " my:" << FillInfoToString(s->myFill.above) << ", " << FillInfoToString(s->myFill.below) << std::endl;
     }
     intersecter.reset();
@@ -496,7 +549,7 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
     }
     std::vector<Segment*> res_C = intersecter.calculate(false);
     for (auto s : res_C) {
-        std::cout << "seg:" << s->start.transpose() << " -> " << s->end.transpose() << std::endl;
+        std::cout << "seg:" << s->start << " -> " << s->end << std::endl;
     }
 
     SegmentSelector selctor;
@@ -507,10 +560,10 @@ std::vector<std::vector<Eigen::Vector2d>> GeometryUtils::calc_AnotB(const std::v
     else {
         sel_segments = selctor.select(selctor.difference2(), res_C);
     }
-    std::vector<std::deque<Eigen::Vector2d>> polygons = selctor.segmentChain(sel_segments);
+    std::vector<std::deque<GU::Point>> polygons = selctor.segmentChain(sel_segments);
     for (auto polygon : polygons) {
         if (polygon.size() > 2) {
-            std::vector<Eigen::Vector2d> polygon_vector(polygon.begin(), polygon.end());
+            std::vector<GU::Point> polygon_vector(polygon.begin(), polygon.end());
             res.push_back(polygon_vector);
         }
     }

@@ -26,14 +26,33 @@ std::vector<Segment> SegmentSelector::select(const Eigen::Matrix4i& selector, st
 }
 
 
-std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std::vector<Segment>& segments) {
-    std::vector<std::deque<Eigen::Vector2d>> polygons;
-    std::vector<std::deque<Eigen::Vector2d>> chains;
+std::vector<std::deque<GU::Point>> SegmentSelector::segmentChain(const std::vector<Segment>& segments) {
+    std::vector<std::deque<GU::Point>> polygons;
+    std::vector<std::deque<GU::Point>> chains;
+
+    // |p1-p2|^2
+    auto norm2 = [](const GU::Point& p1, const GU::Point& p2) -> double {
+        return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+        };
+    // |p1-p2|
+    auto norm = [](const GU::Point& p1, const GU::Point& p2) -> double {
+        return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+        };
+    // (p1-p2)归一化
+    auto normalized = [norm](const GU::Point& p1, const GU::Point& p2) ->GU::Point {
+        double L = norm(p1, p2);
+        if (L < 1e-10) {
+            std::cout << " segmentChain error: zero-length segment detected " << std::endl;
+            return GU::Point(FLT_MAX, FLT_MAX);
+        }
+        return GU::Point((p1.x - p2.x)/L, (p1.y - p2.y)/L);
+        };
+
 
     for (auto seg : segments) {
-        Eigen::Vector2d seg_start = seg.start;
-        Eigen::Vector2d seg_end = seg.end;
-        if ((seg_start - seg_end).norm() < 1e-10) {
+        GU::Point seg_start = seg.start;
+        GU::Point seg_end = seg.end;
+        if (norm2(seg_start, seg_end) < 1e-10) {
             std::cout << " segmentChain error: zero-length segment detected " << std::endl;
             return polygons;
         }
@@ -54,25 +73,25 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
             };
 
         for (int i = 0; i < chains.size(); ++i) {
-            Eigen::Vector2d chain_head = chains[i].front();
-            Eigen::Vector2d chain_tail = chains[i].back();
-            if ((chain_head - seg_start).norm() < 1e-10) {
+            GU::Point chain_head = chains[i].front();
+            GU::Point chain_tail = chains[i].back();
+            if (norm(chain_head, seg_start) < 1e-10) {
                 // 线段起点与链头匹配
                 if (setMatch(i, true, true)) {
                     break;
                 }
             }
-            else if ((chain_head - seg_end).norm() < 1e-10) {
+            else if (norm(chain_head, seg_end) < 1e-10) {
                 if (setMatch(i, true, false)) {
                     break;
                 }
             }
-            else if ((chain_tail - seg_start).norm() < 1e-10) {
+            else if (norm(chain_tail, seg_start) < 1e-10) {
                 if (setMatch(i, false, true)) {
                     break;
                 }
             }
-            else if ((chain_tail - seg_end).norm() < 1e-10) {
+            else if (norm(chain_tail, seg_end) < 1e-10) {
                 if (setMatch(i, false, false)) {
                     break;
                 }
@@ -81,23 +100,23 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
 
         // 没有匹配到链
         if (next_match == first_match) {
-            std::deque<Eigen::Vector2d> chain{ seg_start , seg_end };
+            std::deque<GU::Point> chain{ seg_start , seg_end };
             chains.push_back(chain);
             continue;
         }
         // 匹配到一条链
         if (next_match == second_match) {
             int index = first_match->index;
-            Eigen::Vector2d pt = first_match->matches_seg_start ? seg_end : seg_start;
+            GU::Point pt = first_match->matches_seg_start ? seg_end : seg_start;
             bool addToHead = first_match->matchs_chain_head;
 
-            Eigen::Vector2d grow = addToHead ? chains[index][0] : chains[index][chains[index].size() - 1]; // 前插/后插位置的元素
-            Eigen::Vector2d grow2 = addToHead ? chains[index][1] : chains[index][chains[index].size() - 2];
-            Eigen::Vector2d oppo = addToHead ? chains[index][chains[index].size() - 1] : chains[index][0];
-            Eigen::Vector2d oppo2 = addToHead ? chains[index][chains[index].size() - 2] : chains[index][1];
+            GU::Point grow = addToHead ? chains[index][0] : chains[index][chains[index].size() - 1]; // 前插/后插位置的元素
+            GU::Point grow2 = addToHead ? chains[index][1] : chains[index][chains[index].size() - 2];
+            GU::Point oppo = addToHead ? chains[index][chains[index].size() - 1] : chains[index][0];
+            GU::Point oppo2 = addToHead ? chains[index][chains[index].size() - 2] : chains[index][1];
 
-            Eigen::Vector2d vec_c = (grow2 - grow).normalized();
-            Eigen::Vector2d vec_p = (grow - pt).normalized();
+            GU::Point vec_c = normalized(grow2, grow);
+            GU::Point vec_p = normalized(grow, pt);
             double cross1 = vec_c(0) * vec_p(1) - vec_c(1) * vec_p(0);
             std::cout << "cross : " << cross1 << std::endl;
             // 线段匹配点与链的头/尾共线，删除头尾点
@@ -111,9 +130,9 @@ std::vector<std::deque<Eigen::Vector2d>> SegmentSelector::segmentChain(const std
                 grow = grow2;
             }
             // 线段匹配点和链上匹配点的另一头相接(多边形闭合)
-            if ((oppo - pt).norm() < 1e-10) {
-                Eigen::Vector2d vec_c = (oppo2 - oppo).normalized();
-                Eigen::Vector2d vec_p = (grow - oppo).normalized();
+            if (norm(oppo, pt) < 1e-10) {
+                GU::Point vec_c = normalized(oppo2, oppo);
+                GU::Point vec_p = normalized(grow, oppo);
                 double cross2 = vec_c(0) * vec_p(1) - vec_c(1) * vec_p(0);
                 if (std::fabs(cross2) < 1e-10) {
                     if (addToHead) {

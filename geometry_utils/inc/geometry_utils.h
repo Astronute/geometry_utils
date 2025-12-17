@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 #include <deque>
+#include <set>
 #include "Eigen/Dense"
 #include "geometry_types.h"
 #include "intersecter.h"
@@ -18,13 +19,13 @@ public:
     GeometryUtils();
     ~GeometryUtils();
 
-    GU::Node* upgradePolygon(const std::vector<Eigen::Vector2d> &p);
+    GU::Node* upgradePolygon(const std::vector<GU::Point> &p);
 
     void printPolygon(GU::Node* root);
 
     GU::Node* nextNonIntersection(GU::Node* n);
 
-    double pointInPolygon(const Eigen::Vector2d& p, GU::Node* root);
+    double pointInPolygon(const GU::Point& p, GU::Node* root);
 
     double pointInPolygon(const GU::Point& p, const std::vector<GU::Point>& polygon, bool measureDist);
 
@@ -37,11 +38,11 @@ public:
 
     bool calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon);
     
-    void sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary);
+    void sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary);
 
-    std::vector<Eigen::Vector2d> inflatePolygon(const std::vector<Eigen::Vector2d>& boundary, const double offset);
+    std::vector<GU::Point> inflatePolygon(const std::vector<GU::Vector2d>& boundary, const double offset);
 
-    std::vector<std::vector<Eigen::Vector2d>> calc_AnotB(const std::vector<Eigen::Vector2d>& region_0, const std::vector<Eigen::Vector2d>& region_1);
+    std::vector<std::vector<GU::Point>> calc_AnotB(const std::vector<GU::Point>& region_0, const std::vector<GU::Point>& region_1);
 
 private:
     std::vector<GU::Node*> all_polygon_node_;

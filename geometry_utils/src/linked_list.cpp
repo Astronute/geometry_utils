@@ -54,7 +54,7 @@ void EventList::printList() {
 	EventNode* iter = root->next;
 	while (iter != nullptr) {
 		//if (int(iter->isStart))
-			std::cout << " isstart: " << int(iter->isStart) << ", pos: " << iter->pos.transpose() << " -> " << iter->other->pos.transpose() << std::endl;
+			std::cout << " isstart: " << int(iter->isStart) << ", pos: " << iter->pos << " -> " << iter->other->pos << std::endl;
 		iter = iter->next;
 	}
 }
@@ -113,7 +113,7 @@ void StatusList::addAbove(StatusNode* above, StatusNode* below) {
 void StatusList::printList() {
 	StatusNode* iter = root->next;
 	while (iter != nullptr) {
-		std::cout << "pos: " << iter->ev->pos.transpose() << " -> " << iter->ev->other->pos.transpose() << std::endl;
+		std::cout << "pos: " << iter->ev->pos << " -> " << iter->ev->other->pos << std::endl;
 		iter = iter->next;
 	}
 }

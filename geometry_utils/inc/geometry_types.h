@@ -1,11 +1,37 @@
 #pragma once
-
+#include <stdexcept>
+#include <iostream>
 #include <limits>
-#include "Eigen/Dense"
 
 namespace GU {
+    struct Point {
+        Point() : x(0.0), y(0.0) {}
+        Point(double x_, double y_) : x(x_), y(y_) {}
+
+        double operator()(int index) const {
+            if (index == 0) {
+                return x;
+            }
+            else if (index == 1) {
+                return y;
+            }
+            else {
+                throw std::out_of_range("Vector2d index out of range! Only 0 (x) or 1 (y) are allowed.");
+            }
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const Point& p);
+
+        double x, y;
+    };
+
+    inline std::ostream& operator<<(std::ostream& os, const Point& vec) {
+        os << "(" << vec.x << ", " << vec.y << ")";
+        return os;
+    }
+
     struct Node {
-        Eigen::Vector2d p;
+        Point p;
         bool is_intersection = false;
         Node* next = nullptr;
         Node* prev = nullptr;
@@ -13,19 +39,70 @@ namespace GU {
         double dist; // alongA
     };
 
-    struct Point {
-        Point() {
-        
+    class Vector2d {
+    public:
+        Vector2d() {
         }
-        Point(double x_, double y_) {
+        Vector2d(double x_, double y_) {
             x = x_; y = y_;
+        }
+
+        double operator()(int index) const {
+            if (index == 0) {
+                return x;
+            }
+            else if (index == 1) {
+                return y;
+            }
+            else {
+                throw std::out_of_range("Vector2d index out of range! Only 0 (x) or 1 (y) are allowed.");
+            }
+        }
+
+        Vector2d operator-(const Vector2d& other) const {
+            return Vector2d(this->x - other.x, this->y - other.y);
+        }
+
+        Vector2d operator+(const Vector2d& other) const {
+            return Vector2d(this->x + other.x, this->y + other.y);
+        }
+
+        Vector2d operator*(double val) const {
+            return Vector2d(this->x * val, this->y * val);
+        }
+
+        Vector2d operator/(double val) const {
+            if (std::fabs(val) < 1e-10) {
+                throw std::invalid_argument("Vector2d::operator/ - division by zero (or near-zero scalar)!");
+            }
+            return Vector2d(this->x/val, this->y/val);
+        }
+
+        double norm() {
+            return std::sqrt(x*x+y*y);
+        }
+
+        double dot(const Vector2d& vec) {
+            return this->x * vec(0) + this->y * vec(1);
+        }
+
+        double cross(const Vector2d& vec) {
+            return this->x * vec(1) - this->y * vec(0);
+        }
+
+        Vector2d normalized() {
+            const double norm_ = norm();
+            if (std::fabs(norm_) < 1e-10) {
+                throw std::invalid_argument("Vector2d::normalized() - zero vector cannot be normalized!");
+            }
+            return Vector2d(this->x/norm_, this->y/norm_);
         }
 
         double x, y;
     };
 
     struct Intersection {
-        Eigen::Vector2d p;
+        Point p;
         double cross;
         double isParallel = false;
         double alongA = FLT_MAX;

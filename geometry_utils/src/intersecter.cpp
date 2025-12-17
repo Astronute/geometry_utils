@@ -1,5 +1,5 @@
 #include "intersecter.h"
-
+#include "Eigen/Dense"
 
 Intersecter::Intersecter(){
 	
@@ -9,21 +9,26 @@ Intersecter::~Intersecter(){
 	reset();
 }
 
-bool Intersecter::pointsSame(const Eigen::Vector2d& a, const Eigen::Vector2d& b) {
+bool Intersecter::pointsSame(const GU::Point& a, const GU::Point& b) {
 	return std::fabs(a(0) - b(0)) < EPS && std::fabs(a(1) - b(1)) < EPS;
 }
 
 // 判断点p是否在线段left,right之间
-bool Intersecter::pointBetween(const Eigen::Vector2d& p, const Eigen::Vector2d& left, const Eigen::Vector2d& right) {
-	Eigen::Vector2d line_vec = right - left;
-	Eigen::Vector2d vec = p - left;
+bool Intersecter::pointBetween(const GU::Point& p, const GU::Point& left, const GU::Point& right) {
+	// line_vec(dx1, dy1)
+	// vec(dx2, dy2)
+	double dx1, dy1, dx2, dy2;
+	dx1 = right.x - left.x;
+	dy1 = right.y - left.y;
+	dx2 = p.x - left.x;
+	dy2 = p.y - left.y;
 
-	double dot = line_vec.dot(vec);
+	double dot = dx1 * dx2 + dy1 * dy2;
 	if (dot < EPS) {
 		return false;
 	}
 
-	double sqlen = line_vec.dot(line_vec);
+	double sqlen = dx1 * dx1 + dy1 * dy1;
 	if (dot - sqlen > -EPS) {
 		return false;
 	}
@@ -31,7 +36,7 @@ bool Intersecter::pointBetween(const Eigen::Vector2d& p, const Eigen::Vector2d& 
 }
 
 // 0:相等 -1:p1在p2之前 1:p1在p2之后
-int Intersecter::pointsCompare(const Eigen::Vector2d& p1, const Eigen::Vector2d& p2) {
+int Intersecter::pointsCompare(const GU::Point& p1, const GU::Point& p2) {
 	if (std::fabs(p1(0) - p2(0)) < EPS) {
 		return std::fabs(p1(1) - p2(1)) < EPS ? 0 : p1(1) < p2(1) ? -1 : 1;
 	}
@@ -40,8 +45,8 @@ int Intersecter::pointsCompare(const Eigen::Vector2d& p1, const Eigen::Vector2d&
 
 // p1_isstart:是否起点 p1_0:事件点 p1_1:事件点所在段终点
 // p2_isstart:是否起点 p2_0:事件点 p2_1:事件点所在段终点
-int Intersecter::eventsCompare(const bool& p1_isstart, const Eigen::Vector2d& p1_0, const Eigen::Vector2d& p1_1, 
-	const bool& p2_isstart, const Eigen::Vector2d& p2_0, const Eigen::Vector2d& p2_1) {
+int Intersecter::eventsCompare(const bool& p1_isstart, const GU::Point& p1_0, const GU::Point& p1_1,
+	const bool& p2_isstart, const GU::Point& p2_0, const GU::Point& p2_1) {
 	// 按事件点坐标排序
 	int comp = pointsCompare(p1_0, p2_0);
 	if (comp != 0) {
@@ -56,15 +61,26 @@ int Intersecter::eventsCompare(const bool& p1_isstart, const Eigen::Vector2d& p1
 		return p1_isstart ? 1 : -1;
 	}
 	// 事件点坐标相同，类型相同，优先处理线段位于下方的事件点
+	double dx1, dy1, dx2, dy2;
 	if (p1_isstart) {
-		Eigen::Vector2d vec1 = p1_1 - p1_0;
-		Eigen::Vector2d vec2 = p2_1 - p2_0;
-		return vec2(0) * vec1(1) - vec2(1) * vec1(0) >= 0 ? 1 : -1;
+		// vec1(dx1, dy1)
+		dx1 = p1_1.x - p1_0.x;
+		dy1 = p1_1.y - p1_0.y;
+		// vec2(dx2, dy2)
+		dx2 = p2_1.x - p2_0.x;
+		dy2 = p2_1.y - p2_0.y;
+		// vec2 x vec1
+		return dx2 * dy1 - dy2 * dx1 >= 0 ? 1 : -1;
 	}
 	else {
-		Eigen::Vector2d vec1 = p1_1 - p2_1;
-		Eigen::Vector2d vec2 = p2_0 - p2_1;
-		return vec2(0) * vec1(1) - vec2(1) * vec1(0) >= 0 ? 1 : -1;
+		// vec1(dx1, dy1)
+		dx1 = p1_1.x - p2_1.x;
+		dy1 = p1_1.y - p2_1.y;
+		// vec2(dx2, dy2)
+		dx2 = p2_0.x - p2_1.x;
+		dy2 = p2_0.y - p2_1.y;
+		// vec2 x vec1
+		return dx2 * dy1 - dy2 * dx1 >= 0 ? 1 : -1;
 	}
 }
 
@@ -77,12 +93,20 @@ int Intersecter::statusCompare(EventNode* ev1, EventNode* ev2) {
 	}
 
 	// 求局部上下关系
-	Eigen::Vector2d ev2_vec = ev2->seg->end - ev2->seg->start;
-
-	Eigen::Vector2d vec_ss = ev1->seg->start - ev2->seg->start;
-	Eigen::Vector2d vec_se = ev1->seg->end - ev2->seg->start;
-	double cross1 = ev2_vec(0) * vec_ss(1) - ev2_vec(1) * vec_ss(0);
-	double cross2 = ev2_vec(0) * vec_se(1) - ev2_vec(1) * vec_se(0);
+	double dx1, dy1, dx2, dy2, dx3, dy3;
+	// ev2_vec(dx1, dy1)
+	dx1 = ev2->seg->end.x - ev2->seg->start.x;
+	dy1 = ev2->seg->end.y - ev2->seg->start.y;
+	// vec_ss(dx2, dy2)
+	dx2 = ev1->seg->start.x - ev2->seg->start.x;
+	dy2 = ev1->seg->start.y - ev2->seg->start.y;
+	// vec_se(dx3, dy3)
+	dx3 = ev1->seg->end.x - ev2->seg->start.x;
+	dy3 = ev1->seg->end.y - ev2->seg->start.y;
+	// cross1 = ev2_vec x vec_ss
+	double cross1 = dx1 * dy2 - dy1 * dx2;
+	// cross2 = ev2_vec x vec_se
+	double cross2 = dx1 * dy3 - dy1 * dx3;
 	if (std::fabs(cross1) < EPS) { // 共线
 		if (std::fabs(cross2) < EPS) {
 			return 1;
@@ -95,7 +119,7 @@ int Intersecter::statusCompare(EventNode* ev1, EventNode* ev2) {
 	return inc_y > ev1->seg->start(1) ? -1 : 1;
 }
 
-void Intersecter::eventAdd(EventNode* const root, EventNode* const node, const Eigen::Vector2d other_pt) {
+void Intersecter::eventAdd(EventNode* const root, EventNode* const node, const GU::Point other_pt) {
 	EventNode* last = root;
 	EventNode* here = root->next;
 	while (here != nullptr) {
@@ -115,28 +139,32 @@ void Intersecter::eventAdd(EventNode* const root, EventNode* const node, const E
 	node->next = nullptr;
 }
 
-GU::Intersection Intersecter::linesIntersection(const Eigen::Vector2d& a0, const Eigen::Vector2d& a1, const Eigen::Vector2d& b0, const Eigen::Vector2d& b1) {
-	Eigen::Vector2d A_vec = a1 - a0;
-	Eigen::Vector2d B_vec = b1 - b0;
+GU::Intersection Intersecter::linesIntersection(const GU::Point& a0, const GU::Point& a1, const GU::Point& b0, const GU::Point& b1) {
+	double dx1, dy1, dx2, dy2;
+	// A_vec(dx1, dy1)
+	dx1 = a1.x - a0.x;
+	dy1 = a1.y - a0.y;
+	// B_vec(dx2, dy2)
+	dx2 = b1.x - b0.x;
+	dy2 = b1.y - b0.y;
 
 	GU::Intersection inc;
-	double cross_ab = A_vec(0) * B_vec(1) - A_vec(1) * B_vec(0);
+	double cross_ab = dx1 * dy2 - dy1 * dx2;
 	inc.cross = cross_ab;
 	if (std::fabs(cross_ab) < EPS) {
+		inc.isParallel = true;
 		return inc;
 	}
 	Eigen::Matrix2d A(2, 2);
 	Eigen::Vector2d B(2);
-	A << A_vec(0), -1.0 * (B_vec(0)),
-		A_vec(1), -1.0 * (B_vec(1));
+	A << dx1, -1.0 * dx2,
+		dy1, -1.0 * dy2;
 	B << b0(0) - a0(0),
 		b0(1) - a0(1);
 	Eigen::Vector2d C = A.partialPivLu().solve(B); // colPivHouseholderQr()
 	inc.alongA = C(0);
 	inc.alongB = C(1);
-	inc.p << a0(0) + inc.alongA * (A_vec(0)),
-		a0(1) + inc.alongA * (A_vec(1));
-
+	inc.p = GU::Point(a0(0) + inc.alongA * dx1, a0(1) + inc.alongA * dy1);
 	return inc;
 }
 
@@ -148,10 +176,16 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 	GU::Intersection inc = linesIntersection(ev1->seg->start, ev1->seg->end, ev2->seg->start, ev2->seg->end);
 
 	// 处理平行线
-	if (std::fabs(inc.cross) < EPS) {
-		Eigen::Vector2d ev1_seg_vec = ev1->seg->end - ev1->seg->start;
-		Eigen::Vector2d vec = ev1->seg->end - ev2->seg->start;
-		double cross = ev1_seg_vec(0) * vec(1) - ev1_seg_vec(1) * vec(0);
+	if (inc.isParallel) {
+		double dx1, dy1, dx2, dy2;
+		// ev1_seg_vec(dx1, dy1)
+		dx1 = ev1->seg->end.x - ev1->seg->start.x;
+		dy1 = ev1->seg->end.y - ev1->seg->start.y;
+		// vec(dx2, dy2)
+		dx2 = ev1->seg->end.x - ev2->seg->start.x;
+		dy2 = ev1->seg->end.y - ev2->seg->start.y;
+		// ev1_seg_vec x vec
+		double cross = dx1 * dy2 - dy1 * dx2;
 		// 平行不共线
 		if (!(std::fabs(cross) < EPS)) {
 			return nullptr;
@@ -259,7 +293,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 		if (inc.alongA >= EPS && inc.alongA - 1 <= -EPS) {
 			if (inc.alongB > -EPS && inc.alongB < EPS) {
 				// 交点在A中间B起点 A:event line B:below
-				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
+				std::cout << "                                                               inc: " << inc.p << std::endl;
 				inc_count_++;
 				Segment* new_seg = new Segment(ev2->seg->start, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
@@ -273,7 +307,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				eventAddSegment(new_seg, ev1->primary);
 			}
 			else if (inc.alongB >= EPS && inc.alongB <= 1- EPS) {
-				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
+				std::cout << "                                                               inc: " << inc.p << std::endl;
 				inc_count_++;
 				// 交点在A中间B中间，拆分事件线段，更新事件点other
 				Segment* new_seg = new Segment(inc.p, ev1->seg->end);
@@ -292,7 +326,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 			else if (inc.alongB > 1- EPS && inc.alongB <1+ EPS) {
 				// 交点在A中间B终点 A:event line B:above/below
-				std::cout << "                                                               inc: " << inc.p.transpose() << std::endl;
+				std::cout << "                                                               inc: " << inc.p << std::endl;
 				inc_count_++;
 				Segment* new_seg = new Segment(ev2->seg->end, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
@@ -376,9 +410,9 @@ void Intersecter::eventAddSegment(Segment* const seg, const bool &primary) {
 	all_event_node.push_back(endnode);
 }
 
-void Intersecter::addRegion(const std::vector<Eigen::Vector2d>& region, const bool& primary) {
-	Eigen::Vector2d pt1;
-	Eigen::Vector2d pt2 = region[region.size()-1];
+void Intersecter::addRegion(const std::vector<GU::Point>& region, const bool& primary) {
+	GU::Point pt1;
+	GU::Point pt2 = region[region.size()-1];
 	for (int i = 0; i < region.size(); ++i) {
 		// 段
 		pt1 = pt2;
@@ -406,15 +440,15 @@ void Intersecter::addRegion(const std::vector<Eigen::Vector2d>& region, const bo
 
 EventNode* Intersecter::checkBothIntersections(EventNode* ev, EventNode* above, EventNode* below) {
 	if (above) {
-		std::cout << "above: " << above->pos.transpose() << " -> " << above->other->pos.transpose() << std::endl;
+		std::cout << "above: " << above->pos << " -> " << above->other->pos << std::endl;
 		EventNode* eve = eventsIntersection(ev, above);
 		if (eve) {
-			std::cout << "                                             Overlapping ev: " << eve->pos.transpose() << " -> " << eve->other->pos.transpose() << std::endl;
+			std::cout << "                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos << std::endl;
 			return eve;
 		}
 	}
 	if (below) {
-		std::cout << "below: " << below->pos.transpose() << " -> " << below->other->pos.transpose() << std::endl;
+		std::cout << "below: " << below->pos << " -> " << below->other->pos << std::endl;
 		return eventsIntersection(ev, below);
 	}
 	return nullptr;
@@ -452,7 +486,7 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 			// 2、计算事件点(起点)所在线段与上下状态线段的交点(空间位置)
 			EventNode* eve = checkBothIntersections(ev, above, below);
 			if (eve) {
-				std::cout << "                                             Overlapping ev: " << eve->pos.transpose() << " -> " << eve->other->pos.transpose() << std::endl;
+				std::cout << "                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos << std::endl;
 				if (!selfIntersection) {
 					eve->seg->otherFill = ev->seg->myFill;
 				}
@@ -531,7 +565,7 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 		}
 		else {
 			// ev: 线段终点事件
-			std::cout << "end ev :" << ev->pos.transpose() << " -> " << ev->other->pos.transpose() << std::endl;
+			std::cout << "end ev :" << ev->pos << " -> " << ev->other->pos << std::endl;
 			StatusNode* st = ev->status;
 			if (st == nullptr) {
 				reset();
@@ -570,12 +604,6 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 	}
 	
 	return segments;
-}
-
-std::vector<Eigen::Vector2d> Intersecter::calc_intersections() {
-	std::vector<Eigen::Vector2d> res;
-
-	return res;
 }
 
 void Intersecter::reset() {
