@@ -35,7 +35,7 @@ public:
     template<typename VectorType>
     std::vector<VectorType> simplifyCurve(const std::vector<VectorType>& curve, double epsilon);
 
-    bool calc_line_cross_polygon(const GU::Line& line, const std::vector<Eigen::Vector2d>& polygon);
+    bool calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon);
     
     void sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary);
 

@@ -364,21 +364,23 @@ GeometryUtils::simplifyCurve<Eigen::Vector2d>(const std::vector<Eigen::Vector2d>
 template std::vector<Eigen::Vector2i>
 GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
 
-bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vector<Eigen::Vector2d>& polygon) {
-    //if ((pointInPolygon(Eigen::Vector2d(line.startX, line.startY), polygon, false) == 1) || (pointInPolygon(Eigen::Vector2d(line.endX, line.endY), polygon, false) == 1)) {
-    //    return true;
-    //}
+bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon) {
+    double s_in = pointInPolygon(GU::Point(line.startX, line.startY), polygon, false);
+    double end_in = pointInPolygon(GU::Point(line.endX, line.endY), polygon, false);
+    if (s_in* end_in==-1) {
+        return true;
+    }
 
-    //int len = polygon.size();
-    //Eigen::Vector2d v0, v = polygon[len - 1];
-    //for (int i = 0; i < len; ++i) {
-    //    v0 = v;
-    //    v = polygon[i];
-    //    GU::Intersection inc = calc_linesIntersect(GU::Line(v0(0), v0(1), v(0), v(1)), line);
-    //    if (!inc.isParallel&&(inc.alongA > 1e-10 && inc.alongA < 1 - 1e-10) && (inc.alongB > 1e-10 && inc.alongB < 1 - 1e-10)) {
-    //        return true;
-    //    }
-    //}
+    int len = polygon.size();
+    GU::Point v0, v = polygon[len - 1];
+    for (int i = 0; i < len; ++i) {
+        v0 = v;
+        v = polygon[i];
+        GU::Intersection inc = calc_linesIntersect(GU::Line(v0.x, v0.y, v.x, v.y), line);
+        if (!inc.isParallel&&(inc.alongA > 1e-10 && inc.alongA < 1 - 1e-10) && (inc.alongB > 1e-10 && inc.alongB < 1 - 1e-10)) {
+            return true;
+        }
+    }
 
     return false;
 }
