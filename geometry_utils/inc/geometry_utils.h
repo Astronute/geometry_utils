@@ -31,6 +31,8 @@ public:
 
     double pointInPolygon(const double x, const double y, const double* polygon, int length, bool measureDist);
 
+    bool isIntersection(const GU::Line& lineA, const GU::Line& lineB);
+
     GU::Intersection calc_linesIntersect(const GU::Line& lineA, const GU::Line& lineB);
 
     template<typename VectorType>

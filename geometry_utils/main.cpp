@@ -46,6 +46,12 @@ void main() {
     //                                    cv::Point(25.9256, 5.21851),
     //                                    cv::Point(32.5322, 11.8251) };
 
+    std::vector<GU::Vector2d> vec_region{ GU::Vector2d(0, 0),
+                                       GU::Vector2d(10, 0),
+                                       GU::Vector2d(10, 7),
+                                       GU::Vector2d(0, 7)
+    };
+
     int length = 2 * region_1.size();
     double* fast_region = new double[length];
     for (int i = 0; i < region_1.size(); ++i) {
@@ -54,13 +60,20 @@ void main() {
     }
 
     GeometryUtils GU;
-    std::vector<std::vector<GU::Point>> polygons = GU.calc_AnotB(region_0, region_1);
-    for (int i = 0; i < polygons.size(); ++i) {
-        GU.sort_polygon_vertices_ccw(polygons[i]);
-        for (auto p : polygons[i]) {
-            std::cout << "polygon " << i << ": " << p << std::endl;
-        }
-        std::cout << std::endl;
+    //std::vector<std::vector<GU::Point>> polygons = GU.calc_AnotB(region_0, region_1);
+    //for (int i = 0; i < polygons.size(); ++i) {
+    //    GU.sort_polygon_vertices_ccw(polygons[i]);
+    //    for (auto p : polygons[i]) {
+    //        std::cout << "polygon " << i << ": " << p << std::endl;
+    //    }
+    //    std::cout << std::endl;
+    //}
+
+    std::vector<GU::Point> polygon = GU.inflatePolygon(vec_region, 0.5);
+    for (int i = 0; i < polygon.size(); ++i) {
+        std::cout << polygon[i] << std::endl;
     }
+
+
     delete[] fast_region;
 }

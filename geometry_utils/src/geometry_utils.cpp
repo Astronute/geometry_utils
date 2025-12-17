@@ -55,6 +55,44 @@ void GeometryUtils::printPolygon(GU::Node* root) {
     } while (p!=root);
 }
 
+// 不包含相交于端点，线段平行重叠
+bool GeometryUtils::isIntersection(const GU::Line& lineA, const GU::Line& lineB) {
+    double dx1, dy1, dx2, dy2;
+    // vec line-AB:(dx1, dy1)
+    dx1 = lineA.endX - lineA.startX;
+    dy1 = lineA.endY - lineA.startY;
+    // vec line-CD:(dx2, dy2)
+    dx2 = lineB.endX - lineB.startX;
+    dy2 = lineB.endY - lineB.startY;
+
+    if (std::max(lineA.startX, lineA.endX) < std::min(lineB.startX, lineB.endX) || std::min(lineA.startX, lineA.endX) > std::max(lineB.startX, lineB.endX)) {
+        return false;
+    }
+    if (std::max(lineA.startY, lineA.endY) < std::min(lineB.startY, lineB.endY) || std::min(lineA.startY, lineA.endY) > std::max(lineB.startY, lineB.endY)) {
+        return false;
+    }
+
+    double cx1, cy1, cx2, cy2, cx3, cy3, cx4, cy4;
+    // vec AC:(cx1, cy1)
+    cx1 = lineB.startX - lineA.startX;
+    cy1 = lineB.startY - lineA.startY;
+    // vec AD:(cx2, cy2)
+    cx2 = lineB.endX - lineA.startX;
+    cy2 = lineB.endY - lineA.startY;
+    // vec CA:(cx3, cy3)
+    cx3 = lineA.startX - lineB.startX;
+    cy3 = lineA.startY - lineB.startY;
+    // vec CB:(cx4, cy4)
+    cx4 = lineA.endX - lineB.startX;
+    cy4 = lineA.endY - lineB.startY;
+
+    if ((cx1*dy1-cy1*dx1) * (cx2 * dy1-cy2*dx1) >= 0 || (cx3*dy2-cy3*dx2) * (cx4*dy2-cy4*dx2) >= 0) {
+        return false;
+    }
+
+    return true;
+}
+
 GU::Intersection GeometryUtils::calc_linesIntersect(const GU::Line& lineA, const GU::Line& lineB) {
     double dx1 = lineA.endX - lineA.startX;
     double dy1 = lineA.endY - lineA.startY;
@@ -356,11 +394,11 @@ std::vector<VectorType> GeometryUtils::simplifyCurve(const std::vector<VectorTyp
     return dp_path;
 }
 
-template std::vector<Eigen::Vector2d>
-GeometryUtils::simplifyCurve<Eigen::Vector2d>(const std::vector<Eigen::Vector2d>& curve, double epsilon);
-
-template std::vector<Eigen::Vector2i>
-GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
+//template std::vector<Eigen::Vector2d>
+//GeometryUtils::simplifyCurve<Eigen::Vector2d>(const std::vector<Eigen::Vector2d>& curve, double epsilon);
+//
+//template std::vector<Eigen::Vector2i>
+//GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
 
 bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon) {
     double s_in = pointInPolygon(GU::Point(line.startX, line.startY), polygon, false);
@@ -447,63 +485,63 @@ std::vector<GU::Point> GeometryUtils::inflatePolygon(const std::vector<GU::Vecto
         }
     }
 
-    //// 处理无效边 情况2
-    //{
-    //    int mask_len = invalid_edge_mask.size();
-    //    std::vector<bool> visited(mask_len, false);
-    //    for (int i = 0; i < invalid_edge_mask.size(); ++i) {
-    //        std::set<int> invalid_index;
-    //        if (!invalid_edge_mask[i]) {
-    //            valid_point.push_back(off_edges[i].start_point);
-    //        }
-    //        if (invalid_edge_mask[i] && !visited[i]) {
-    //            visited[i] = true;
-    //            invalid_index.insert(i);
-    //            int left = i - 1;
-    //            int l_index = (left + mask_len) % mask_len;
-    //            while (invalid_edge_mask[l_index]) {
-    //                visited[l_index] = true;
-    //                invalid_index.insert(l_index);
-    //                l_index = (--left + mask_len) % mask_len;
-    //            }
+    // 处理无效边 情况2
+    {
+        int mask_len = invalid_edge_mask.size();
+        std::vector<bool> visited(mask_len, false);
+        for (int i = 0; i < invalid_edge_mask.size(); ++i) {
+            std::set<int> invalid_index;
+            if (!invalid_edge_mask[i]) {
+                valid_point.push_back(GU::Point(off_edges[i].startX, off_edges[i].startY));
+            }
+            if (invalid_edge_mask[i] && !visited[i]) {
+                visited[i] = true;
+                invalid_index.insert(i);
+                int left = i - 1;
+                int l_index = (left + mask_len) % mask_len;
+                while (invalid_edge_mask[l_index]) {
+                    visited[l_index] = true;
+                    invalid_index.insert(l_index);
+                    l_index = (--left + mask_len) % mask_len;
+                }
 
-    //            int right = i + 1;
-    //            int r_index = right % mask_len;
-    //            while (invalid_edge_mask[r_index]) {
-    //                if (invalid_edge_mask[r_index]) {
-    //                    visited[r_index] = true;
-    //                    invalid_index.insert(r_index);
-    //                    r_index = (++right) % mask_len;
-    //                }
-    //            }
+                int right = i + 1;
+                int r_index = right % mask_len;
+                while (invalid_edge_mask[r_index]) {
+                    if (invalid_edge_mask[r_index]) {
+                        visited[r_index] = true;
+                        invalid_index.insert(r_index);
+                        r_index = (++right) % mask_len;
+                    }
+                }
 
-    //            if (invalid_index.size() > 1) {
-    //                std::cout << " process case2, num: " << invalid_index.size() << std::endl;
-    //                for (int idx : invalid_index) {
-    //                    // 计算无效边偏移
-    //                    Eigen::Vector2d p0_vec = boundary[idx];
-    //                    Eigen::Vector2d p1_vec = boundary[(idx + 1) % N];
-    //                    Eigen::Vector2d T_vec = (p1_vec - p0_vec).normalized();
-    //                    Eigen::Vector2d N_vec = Eigen::Vector2d(-1.0 * T_vec(1), T_vec(0)).normalized();
-    //                    Eigen::Vector2d new_p0_vec = p0_vec + offset * N_vec;
-    //                    Eigen::Vector2d new_p1_vec = p1_vec + offset * N_vec;
-    //                    SPline2D new_off_line = SPline2D(new_p0_vec, new_p1_vec);
-    //                    // 计算与左右有效边的交点
-    //                    Eigen::Vector2d left_inc, right_inc;
-    //                    if (new_off_line.is_intersecting(off_edges[l_index])) {
-    //                        new_off_line.calc_intersection(off_edges[l_index], left_inc);
-    //                        off_edges[l_index] = SPline2D(off_edges[l_index].start_point, left_inc);
-    //                    }
-    //                    if (new_off_line.is_intersecting(off_edges[r_index])) {
-    //                        new_off_line.calc_intersection(off_edges[r_index], right_inc);
-    //                        off_edges[r_index] = SPline2D(right_inc, off_edges[r_index].end_point);
-    //                    }
-    //                }
-    //                valid_point.push_back(off_edges[l_index].end_point);
-    //            }
-    //        }
-    //    }
-    //}
+                if (invalid_index.size() > 1) {
+                    std::cout << " process case2, num: " << invalid_index.size() << std::endl;
+                    for (int idx : invalid_index) {
+                        // 计算无效边偏移
+                        GU::Vector2d p0_vec = boundary[idx];
+                        GU::Vector2d p1_vec = boundary[(idx + 1) % N];
+                        GU::Vector2d T_vec = (p1_vec - p0_vec).normalized();
+                        GU::Vector2d N_vec = GU::Vector2d(-1.0 * T_vec(1), T_vec(0)).normalized();
+                        GU::Vector2d new_p0_vec = p0_vec + N_vec * offset;
+                        GU::Vector2d new_p1_vec = p1_vec + N_vec * offset;
+                        GU::Line new_off_line = GU::Line(new_p0_vec, new_p1_vec);
+                        // 计算与左右有效边的交点
+                        GU::Intersection left_inc, right_inc;
+                        if (isIntersection(new_off_line, off_edges[l_index])) {
+                            left_inc = calc_linesIntersect(new_off_line, off_edges[l_index]);
+                            off_edges[l_index] = GU::Line(GU::Point(off_edges[l_index].startX, off_edges[l_index].startY), left_inc.p);
+                        }
+                        if (isIntersection(new_off_line, off_edges[r_index])) {
+                            right_inc = calc_linesIntersect(new_off_line, off_edges[r_index]);
+                            off_edges[r_index] = GU::Line(right_inc.p, GU::Point(off_edges[r_index].endX, off_edges[r_index].endY));
+                        }
+                    }
+                    valid_point.push_back(GU::Point(off_edges[l_index].endX, off_edges[l_index].endY));
+                }
+            }
+        }
+    }
 
     return valid_point;
 }

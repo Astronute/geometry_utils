@@ -117,6 +117,14 @@ namespace GU {
             startX = x1; startY = y1;
             endX = x2; endY = y2;
         }
+        Line(Point p1, Point p2) {
+            startX = p1.x; startY = p1.y;
+            endX = p2.x; endY = p2.y;
+        }
+        Line(Vector2d v1, Vector2d v2) {
+            startX = v1.x; startY = v1.y;
+            endX = v2.x; endY = v2.y;
+        }
 
         double startX, startY, endX, endY;
         bool valid;
