@@ -16,8 +16,20 @@ namespace GU {
     struct Intersection {
         Eigen::Vector2d p;
         double cross;
-        double alongA = std::numeric_limits<double>::max();
-        double alongB = std::numeric_limits<double>::max();
+        double isParallel = false;
+        double alongA = FLT_MAX;
+        double alongB = FLT_MAX;
+    };
+
+    struct Line {
+
+        Line(double x1, double y1, double x2, double y2) {
+            startX = x1; startY = y1;
+            endX = x2; endY = y2;
+        }
+
+        double startX, startY, endX, endY;
+        bool valid;
     };
 
     struct MatchPoint {

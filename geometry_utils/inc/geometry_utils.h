@@ -32,6 +32,8 @@ public:
 
     GU::Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
 
+    GU::Intersection calc_linesIntersect(const GU::Line& lineA, const GU::Line& lineB);
+
     template<typename VectorType>
     std::vector<VectorType> simplifyCurve(const std::vector<VectorType>& curve, double epsilon);
 

@@ -54,7 +54,7 @@ void main() {
     }
 
     GeometryUtils GU;
-    std::cout << GU.pointInPolygon(22.0138, 1.4954, fast_region, length, true) << std::endl;
+    std::cout << GU.calc_linesIntersect(GU::Line(6.80226, -1.03985, 32.5322, 11.8251), GU::Line(0, 0, 100, 0)).p.transpose() << std::endl;
     //std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     //for (int i = 0; i < polygons.size(); ++i) {
     //    GU.sort_polygon_vertices_ccw(polygons[i]);
