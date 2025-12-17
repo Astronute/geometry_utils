@@ -13,6 +13,17 @@ namespace GU {
         double dist; // alongA
     };
 
+    struct Point {
+        Point() {
+        
+        }
+        Point(double x_, double y_) {
+            x = x_; y = y_;
+        }
+
+        double x, y;
+    };
+
     struct Intersection {
         Eigen::Vector2d p;
         double cross;
@@ -22,7 +33,9 @@ namespace GU {
     };
 
     struct Line {
-
+        Line() {
+        
+        }
         Line(double x1, double y1, double x2, double y2) {
             startX = x1; startY = y1;
             endX = x2; endY = y2;

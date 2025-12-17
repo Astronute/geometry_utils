@@ -132,7 +132,7 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d &p, GU::Node* root){
     return res;
 }
 
-double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon, bool measureDist) {
+double GeometryUtils::pointInPolygon(const GU::Point& p, const std::vector<GU::Point>& polygon, bool measureDist) {
     double res = 0;
     int counter = 0;
     int len = polygon.size();
@@ -140,27 +140,31 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
     double min_dist_num = FLT_MAX;
     double min_dist_denom = 1;
 
-    Eigen::Vector2d v0, v = polygon[len - 1];
+    GU::Point v0, v = polygon[len - 1];
 
     if (!measureDist) {
         for (int i = 0; i < len; ++i) {
+            double dx, dy, dx1, dy1;
+
             v0 = v;
             v = polygon[i];
-            if ((v0(1) <= p(1) && v(1) <= p(1)) || (v0(1) > p(1) && v(1) > p(1)) || (v0(0) < p(0) && v(0) < p(0))) {
-                if (p(1) == v(1) && (p(0) == v(0) || (p(1) == v0(1) &&
-                    ((v0(0) <= p(0) && p(0) <= v(0)) || (v(0) <= p(0) && p(0) <= v0(0)))))) {
+            dx = v.x - v0.x;
+            dy = v.y - v0.y;
+            dx1 = p.x - v0.x;
+            dy1 = p.y - v0.y;
+            if ((v0.y <= p.y && v.y <= p.y) || (v0.y > p.y && v.y > p.y) || (v0.x < p.x && v.x < p.x)) {
+                if (p.y == v.y && (p.x == v.x || (p.y == v0.y &&
+                    ((v0.x <= p.x && p.x <= v.x) || (v.x <= p.x && p.x <= v0.x))))) {
                     return 0;
                 }
                 continue;
             }
 
-            Eigen::Vector2d v0_v = v - v0;
-            Eigen::Vector2d v0_p = p - v0;
-            double cross = v0_v(0) * v0_p(1) - v0_v(1) * v0_p(0);
+            double cross = dx * dy1 - dy * dx1;
             if (cross == 0) {
                 return 0;
             }
-            if (v(1) < v0(1)) {
+            if (v.y < v0.y) {
                 cross = -cross;
             }
             counter += cross > 0;
@@ -174,12 +178,12 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
             
             v0 = v;
             v = polygon[i];
-            dx = v(0) - v0(0);
-            dy = v(1) - v0(1);
-            dx1 = p(0) - v0(0);
-            dy1 = p(1) - v0(1);
-            dx2 = p(0) - v(0);
-            dy2 = p(1) - v(1);
+            dx = v.x - v0.x;
+            dy = v.y - v0.y;
+            dx1 = p.x - v0.x;
+            dy1 = p.y - v0.y;
+            dx2 = p.x - v.x;
+            dy2 = p.y - v.y;
             if (dx1 * dx + dy1 * dy <= 0) {
                 dist_num = dx1 * dx1 + dy1 * dy1;
             }
@@ -198,7 +202,7 @@ double GeometryUtils::pointInPolygon(const Eigen::Vector2d& p, const std::vector
                     break;
                 }
             }
-            if ((v0(1) <= p(1) && v(1) <= p(1)) || (v0(1) > p(1) && v(1) > p(1)) || (v0(0) < p(0) && v(0) < p(0))) {
+            if ((v0.y <= p.y && v.y <= p.y) || (v0.y > p.y && v.y > p.y) || (v0.x < p.x && v.x < p.x)) {
                 continue;
             }
             dist_num = dy1 * dx - dx1 * dy;
@@ -360,21 +364,21 @@ GeometryUtils::simplifyCurve<Eigen::Vector2d>(const std::vector<Eigen::Vector2d>
 template std::vector<Eigen::Vector2i>
 GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
 
-bool GeometryUtils::calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon) {
-    if ((pointInPolygon(lstart, polygon, false) == 1) || (pointInPolygon(lend, polygon, false) == 1)) {
-        return true;
-    }
+bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vector<Eigen::Vector2d>& polygon) {
+    //if ((pointInPolygon(Eigen::Vector2d(line.startX, line.startY), polygon, false) == 1) || (pointInPolygon(Eigen::Vector2d(line.endX, line.endY), polygon, false) == 1)) {
+    //    return true;
+    //}
 
-    int len = polygon.size();
-    Eigen::Vector2d v0, v = polygon[len - 1];
-    for (int i = 0; i < len; ++i) {
-        v0 = v;
-        v = polygon[i];
-        GU::Intersection inc = calc_linesIntersect(v0, v, lstart, lend);
-        if ((inc.alongA>1e-10&& inc.alongA<1-1e-10) && (inc.alongB > 1e-10 && inc.alongB < 1 - 1e-10)) {
-            return true;
-        }
-    }
+    //int len = polygon.size();
+    //Eigen::Vector2d v0, v = polygon[len - 1];
+    //for (int i = 0; i < len; ++i) {
+    //    v0 = v;
+    //    v = polygon[i];
+    //    GU::Intersection inc = calc_linesIntersect(GU::Line(v0(0), v0(1), v(0), v(1)), line);
+    //    if (!inc.isParallel&&(inc.alongA > 1e-10 && inc.alongA < 1 - 1e-10) && (inc.alongB > 1e-10 && inc.alongB < 1 - 1e-10)) {
+    //        return true;
+    //    }
+    //}
 
     return false;
 }

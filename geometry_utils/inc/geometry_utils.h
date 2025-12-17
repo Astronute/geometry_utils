@@ -26,18 +26,16 @@ public:
 
     double pointInPolygon(const Eigen::Vector2d& p, GU::Node* root);
 
-    double pointInPolygon(const Eigen::Vector2d& p, const std::vector<Eigen::Vector2d>& polygon, bool measureDist);
+    double pointInPolygon(const GU::Point& p, const std::vector<GU::Point>& polygon, bool measureDist);
 
     double pointInPolygon(const double x, const double y, const double* polygon, int length, bool measureDist);
-
-    GU::Intersection calc_linesIntersect(const Eigen::Vector2d &a0, const Eigen::Vector2d &a1, const Eigen::Vector2d &b0, const Eigen::Vector2d &b1);
 
     GU::Intersection calc_linesIntersect(const GU::Line& lineA, const GU::Line& lineB);
 
     template<typename VectorType>
     std::vector<VectorType> simplifyCurve(const std::vector<VectorType>& curve, double epsilon);
 
-    bool calc_line_cross_polygon(const Eigen::Vector2d& lstart, const Eigen::Vector2d& lend, const std::vector<Eigen::Vector2d>& polygon);
+    bool calc_line_cross_polygon(const GU::Line& line, const std::vector<Eigen::Vector2d>& polygon);
     
     void sort_polygon_vertices_ccw(std::vector<Eigen::Vector2d>& boundary);
 

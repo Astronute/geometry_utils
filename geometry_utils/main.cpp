@@ -29,16 +29,16 @@ void main() {
     //                                   Eigen::Vector2d(1, 2)
     //};
 
-    std::vector<Eigen::Vector2d> region_0{ Eigen::Vector2d(16.366, 13.9891),
-                                   Eigen::Vector2d(16.2736, 13.7581),
-                                   Eigen::Vector2d(16.6533,  13.948)
+    std::vector<GU::Point> region_0{ GU::Point(16.366, 13.9891),
+                                   GU::Point(16.2736, 13.7581),
+                                   GU::Point(16.6533,  13.948)
     };
 
-    std::vector<Eigen::Vector2d> region_1{ Eigen::Vector2d(6.80226, -1.03985),
-                                           Eigen::Vector2d(22.0138,  1.4954),
-                                           Eigen::Vector2d(44.6356, -1.01814),
-                                           Eigen::Vector2d(25.9256, 5.21851),
-                                           Eigen::Vector2d(32.5322, 11.8251) };
+    std::vector<GU::Point> region_1{ GU::Point(6.80226, -1.03985),
+                                    GU::Point(22.0138,  1.4954),
+                                    GU::Point(44.6356, -1.01814),
+                                    GU::Point(25.9256, 5.21851),
+                                    GU::Point(32.5322, 11.8251) };
 
     std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
                                         cv::Point(22.0138,  1.4954),
@@ -49,12 +49,12 @@ void main() {
     int length = 2 * region_1.size();
     double* fast_region = new double[length];
     for (int i = 0; i < region_1.size(); ++i) {
-        fast_region[2 * i] = region_1[i](0);
-        fast_region[2 * i + 1] = region_1[i](1);
+        fast_region[2 * i] = region_1[i].x;
+        fast_region[2 * i + 1] = region_1[i].y;
     }
 
     GeometryUtils GU;
-    std::cout << GU.calc_linesIntersect(GU::Line(6.80226, -1.03985, 32.5322, 11.8251), GU::Line(0, 0, 100, 0)).p.transpose() << std::endl;
+    std::cout << GU.pointInPolygon(GU::Point(22.0138, 1.4954), region_1, false) << std::endl;
     //std::vector<std::vector<Eigen::Vector2d>> polygons = GU.calc_AnotB(region_0, region_1);
     //for (int i = 0; i < polygons.size(); ++i) {
     //    GU.sort_polygon_vertices_ccw(polygons[i]);
