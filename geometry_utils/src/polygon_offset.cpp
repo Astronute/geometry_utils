@@ -5,6 +5,63 @@ PolygonOffset::PolygonOffset() {}
 
 PolygonOffset::~PolygonOffset() {}
 
+bool PolygonOffset::pointsSame(const GU::Point& a, const GU::Point& b) {
+    return std::fabs(a(0) - b(0)) < EPS && std::fabs(a(1) - b(1)) < EPS;
+}
+
+// 计算自交点
+std::unordered_map<int, std::vector<GU::Point>> PolygonOffset::getIntersectionPoints(const std::vector<GU::Point>& polygon) {
+    std::unordered_map<int, std::vector<GU::Point>> intersection_map; // 顶点x：交点1、交点2...
+    GeometryUtils gu;
+
+    int len = polygon.size();
+    for (int i = 0; i < len; ++i) {
+        GU::Line line = GU::Line(polygon[i], polygon[(i + 1) % len]);
+        for (int j = 0; j < len; ++j) {
+            if (std::abs(i - j) > 1) {
+                GU::Line line_a = GU::Line(polygon[j], polygon[(j + 1) % len]);
+                if (gu.isIntersection(line, line_a)) {
+                    GU::Intersection inc = gu.calc_linesIntersect(line, line_a);
+                    intersection_map[i].push_back(inc.p);
+                    intersection_map[j].push_back(inc.p);
+                }
+            }
+        }
+    }
+
+    // 去除重复点
+    for (int idx = 0; idx < len; ++idx) {
+        for (int i = 0; i < intersection_map[idx].size(); ++i) {
+            for (int j = i + 1; j < intersection_map[idx].size(); ++j) {
+                if (pointsSame(intersection_map[idx][i], intersection_map[idx][j])) {
+                    auto it = intersection_map[idx].begin();
+                    intersection_map[idx].erase(it + j);
+                }
+            }
+        }
+    }
+    // 点排序
+    for (int idx = 0; idx < len; ++idx) {
+        for (int i = 0; i < intersection_map[idx].size(); ++i) {
+            auto cmp = [&](GU::Point a, GU::Point b) {
+                double d1 = (a.x - polygon[idx].x) * (a.x - polygon[idx].x) + (a.y - polygon[idx].y) * (a.y - polygon[idx].y);
+                double d2 = (b.x - polygon[idx].x) * (b.x - polygon[idx].x) + (b.y - polygon[idx].y) * (b.y - polygon[idx].y);
+                return d1 < d2;
+                };
+
+            std::sort(intersection_map[idx].begin(), intersection_map[idx].end(), cmp);
+        }
+    }
+    // for(int idx=0; idx<len; ++idx){ // debug
+    //     std::cout << " idx: " << idx << std::endl;
+    //     for(auto p: intersection_map[idx]){
+    //         std::cout << p.transpose() << std::endl;
+    //     }
+    // }
+
+    return intersection_map;
+}
+
 std::vector<GU::Point> PolygonOffset::inflatePolygon(const std::vector<GU::Point>& polygon, const double offset) {
     std::vector<GU::Point> valid_point;
     std::vector<GU::Vector2d> boundary;
@@ -121,4 +178,80 @@ std::vector<GU::Point> PolygonOffset::inflatePolygon(const std::vector<GU::Point
     }
 
     return valid_point;
+}
+
+std::vector<std::vector<GU::Point>> PolygonOffset::processRing(const std::vector<GU::Point>& ring) {
+    std::vector<std::vector<GU::Point>> all_rings;
+    std::vector<std::vector<GU::Point>> valid_rings;
+
+    // 获取自交点
+    std::unordered_map<int, std::vector<GU::Point>> insection_map = getIntersectionPoints(ring);
+    std::vector<GU::Point> all_points;
+    std::vector<bool> isIntersection;
+    for (int i = 0; i < ring.size(); ++i) {
+        all_points.push_back(ring[i]);
+        isIntersection.push_back(false);
+        if (!insection_map[i].empty()) {
+            for (auto p : insection_map[i]) {
+                all_points.push_back(p);
+                isIntersection.push_back(true);
+            }
+        }
+    }
+
+    int len = all_points.size();
+    std::vector<bool> visited(all_points.size(), false);
+    std::queue<std::pair<int, GU::Point>> searchlist;
+    searchlist.push(std::make_pair(0, all_points[0]));
+
+    while (!searchlist.empty()) {
+        auto search_info = searchlist.front();
+        int search_idx = search_info.first;
+        GU::Point startPoint = search_info.second;
+        searchlist.pop();
+
+        std::vector<GU::Point> new_ring;
+        new_ring.push_back(search_info.second); // from queue
+
+        int search_next_idx = (search_idx + 1) % len;
+        GU::Point nextPoint = all_points[search_next_idx];
+        while (!pointsSame(nextPoint, startPoint)) {
+            if (!isIntersection[search_next_idx]) {
+                new_ring.push_back(nextPoint);
+                visited[search_next_idx] = true;
+                search_next_idx = (search_next_idx + 1) % len;
+                nextPoint = all_points[search_next_idx];
+            }
+            else {
+                searchlist.push(std::make_pair(search_next_idx, all_points[search_next_idx]));
+                for (int i = 0; i < len; ++i) {
+                    if (pointsSame(nextPoint, all_points[i]) && search_next_idx != i) {
+                        new_ring.push_back(all_points[i]);
+                        visited[i] = true;
+                        search_next_idx = (i + 1) % len;
+                        nextPoint = all_points[search_next_idx];
+                        break;
+                    }
+                }
+            }
+
+            nextPoint = all_points[search_next_idx];
+        }
+        all_rings.push_back(new_ring);
+    }
+
+    // std::cout << " ring num: " << all_rings.size() << std::endl;
+    // 去无效环
+    for (auto r : all_rings) {
+        double area = 0.0;
+        for (int i = 0; i < r.size(); ++i) {
+            area += r[i](0) * r[(i + 1) % r.size()](1) - r[i](1) * r[(i + 1) % r.size()](0);
+        }
+        if (area > 0) {
+            valid_rings.push_back(r);
+        }
+        std::cout << " ring area: " << area << std::endl;
+    }
+
+    return valid_rings;
 }
