@@ -8,6 +8,7 @@
 #include <cmath>
 #include <algorithm>
 #include "geometry_utils.h"
+#include "polygon_offset.h"
 //#include "intersecter.h"
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
@@ -62,8 +63,8 @@ void main() {
     //    }
     //    std::cout << std::endl;
     //}
-
-    std::vector<GU::Point> polygon = GU.inflatePolygon(region_0, 0.5);
+    PolygonOffset po;
+    std::vector<GU::Point> polygon = po.inflatePolygon(region_0, 0.5);
     for (int i = 0; i < polygon.size(); ++i) {
         std::cout << polygon[i] << std::endl;
     }

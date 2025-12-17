@@ -137,6 +137,7 @@
     <ClInclude Include="inc\geometry_utils.h" />
     <ClInclude Include="inc\intersecter.h" />
     <ClInclude Include="inc\linked_list.h" />
+    <ClInclude Include="inc\polygon_offset.h" />
     <ClInclude Include="inc\selector.h" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,7 @@
     <ClCompile Include="src\geometry_utils.cpp" />
     <ClCompile Include="src\intersecter.cpp" />
     <ClCompile Include="src\linked_list.cpp" />
+    <ClCompile Include="src\polygon_offset.cpp" />
     <ClCompile Include="src\selector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
