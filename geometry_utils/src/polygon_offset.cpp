@@ -261,7 +261,7 @@ std::vector<std::vector<GU::Point>> PolygonOffset::inflatePolygon(const std::vec
 
     // 边界偏移，去除无效线段
     std::vector<GU::Point> valid_points = inflateLines(polygon, offset);
-    if (valid_points.size() > 3) {
+    if (valid_points.size() >= 3) {
         // 去除无效环
         return processRing(valid_points);
     }
