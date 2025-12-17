@@ -46,6 +46,9 @@ namespace GU {
         Vector2d(double x_, double y_) {
             x = x_; y = y_;
         }
+        Vector2d(const Point &p) {
+            x = p.x; y = p.y;
+        }
 
         double operator()(int index) const {
             if (index == 0) {

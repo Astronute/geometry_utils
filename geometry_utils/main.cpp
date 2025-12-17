@@ -46,12 +46,6 @@ void main() {
     //                                    cv::Point(25.9256, 5.21851),
     //                                    cv::Point(32.5322, 11.8251) };
 
-    std::vector<GU::Vector2d> vec_region{ GU::Vector2d(0, 0),
-                                       GU::Vector2d(10, 0),
-                                       GU::Vector2d(10, 7),
-                                       GU::Vector2d(0, 7)
-    };
-
     int length = 2 * region_1.size();
     double* fast_region = new double[length];
     for (int i = 0; i < region_1.size(); ++i) {
@@ -69,7 +63,7 @@ void main() {
     //    std::cout << std::endl;
     //}
 
-    std::vector<GU::Point> polygon = GU.inflatePolygon(vec_region, 0.5);
+    std::vector<GU::Point> polygon = GU.inflatePolygon(region_0, 0.5);
     for (int i = 0; i < polygon.size(); ++i) {
         std::cout << polygon[i] << std::endl;
     }

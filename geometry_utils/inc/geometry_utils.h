@@ -42,7 +42,7 @@ public:
     
     void sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary);
 
-    std::vector<GU::Point> inflatePolygon(const std::vector<GU::Vector2d>& boundary, const double offset);
+    std::vector<GU::Point> inflatePolygon(const std::vector<GU::Point>& polygon, const double offset);
 
     std::vector<std::vector<GU::Point>> calc_AnotB(const std::vector<GU::Point>& region_0, const std::vector<GU::Point>& region_1);
 

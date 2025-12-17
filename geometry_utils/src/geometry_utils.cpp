@@ -434,8 +434,13 @@ void GeometryUtils::sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary) 
 
 }
 
-std::vector<GU::Point> GeometryUtils::inflatePolygon(const std::vector<GU::Vector2d>& boundary, const double offset) {
+std::vector<GU::Point> GeometryUtils::inflatePolygon(const std::vector<GU::Point>& polygon, const double offset) {
     std::vector<GU::Point> valid_point;
+    std::vector<GU::Vector2d> boundary;
+    for (auto p : polygon) {
+        boundary.push_back(GU::Vector2d(p));
+    }
+
     // ¼ÆËã¶¥µãÆ«ÒÆ
     int N = boundary.size();
     std::vector<GU::Vector2d> off_points;
