@@ -18,28 +18,28 @@
 
 void main() {
     // region test
-    std::vector<GU::Point> region_0{ GU::Point(0, 0),
-                                       GU::Point(10, 0),
-                                       GU::Point(10, 7),
-                                       GU::Point(0, 7)
-    };
+    //std::vector<GU::Point> region_0{ GU::Point(0, 0),
+    //                                   GU::Point(10, 0),
+    //                                   GU::Point(10, 7),
+    //                                   GU::Point(0, 7)
+    //};
 
-    std::vector<GU::Point> region_1{ GU::Point(0, 0),
-                                       GU::Point(2, 1),
-                                       GU::Point(10, 7),
-                                       GU::Point(1, 2)
-    };
+    //std::vector<GU::Point> region_1{ GU::Point(0, 0),
+    //                                   GU::Point(2, 1),
+    //                                   GU::Point(10, 7),
+    //                                   GU::Point(1, 2)
+    //};
 
     //std::vector<GU::Point> region_0{ GU::Point(16.366, 13.9891),
     //                               GU::Point(16.2736, 13.7581),
     //                               GU::Point(16.6533,  13.948)
     //};
 
-    //std::vector<GU::Point> region_1{ GU::Point(6.80226, -1.03985),
-    //                                GU::Point(22.0138,  1.4954),
-    //                                GU::Point(44.6356, -1.01814),
-    //                                GU::Point(25.9256, 5.21851),
-    //                                GU::Point(32.5322, 11.8251) };
+    std::vector<GU::Point> region_1{ GU::Point(6.80226, -1.03985),
+                                    GU::Point(22.0138,  1.4954),
+                                    GU::Point(44.6356, -1.01814),
+                                    GU::Point(25.9256, 5.21851),
+                                    GU::Point(32.5322, 11.8251) };
 
     //std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
     //                                    cv::Point(22.0138,  1.4954),
@@ -64,10 +64,14 @@ void main() {
     //    std::cout << std::endl;
     //}
     PolygonOffset po;
-    std::vector<GU::Point> polygon = po.inflatePolygon(region_0, 0.5);
-    for (int i = 0; i < polygon.size(); ++i) {
-        std::cout << polygon[i] << std::endl;
+    std::vector<std::vector<GU::Point>> rings = po.inflatePolygon(region_1, 0.7);
+    for (int i = 0; i < rings.size(); ++i) {
+        std::cout << "ring : " << i << std::endl;
+        for (int j = 0; j < rings[i].size(); ++j) {
+            std::cout << rings[i][j] << std::endl;
+        }
     }
+
 
 
     delete[] fast_region;

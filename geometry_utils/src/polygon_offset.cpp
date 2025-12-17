@@ -62,7 +62,7 @@ std::unordered_map<int, std::vector<GU::Point>> PolygonOffset::getIntersectionPo
     return intersection_map;
 }
 
-std::vector<GU::Point> PolygonOffset::inflatePolygon(const std::vector<GU::Point>& polygon, const double offset) {
+std::vector<GU::Point> PolygonOffset::inflateLines(const std::vector<GU::Point>& polygon, const double offset) {
     std::vector<GU::Point> valid_point;
     std::vector<GU::Vector2d> boundary;
     GeometryUtils gu;
@@ -254,4 +254,18 @@ std::vector<std::vector<GU::Point>> PolygonOffset::processRing(const std::vector
     }
 
     return valid_rings;
+}
+
+std::vector<std::vector<GU::Point>> PolygonOffset::inflatePolygon(const std::vector<GU::Point>& polygon, const double offset) {
+    std::vector<std::vector<GU::Point>> res;
+
+    // 边界偏移，去除无效线段
+    std::vector<GU::Point> valid_points = inflateLines(polygon, offset);
+    if (valid_points.size() > 3) {
+        // 去除无效环
+        return processRing(valid_points);
+    }
+    else {
+        return res;
+    }
 }
