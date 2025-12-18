@@ -488,6 +488,10 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
         filter_vertex.push_back(p_vertex->p);
         p_vertex = p_vertex->next;
     } while (p_vertex != root);
+    for (auto node : all_polygon_node_) {
+        delete node;
+    }
+    all_polygon_node_.clear();
 
     if (filter_vertex.size() < 3) {
         std::cout << " Invalid polygon: fewer than 3 vertices " << std::endl;
