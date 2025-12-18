@@ -34,6 +34,8 @@ public:
 
 	void eventAddSegment(Segment* const seg, const bool &primary);
 
+	std::vector<GU::Intersection> calcIntersect();
+
 	std::vector<Segment*> calculate(const bool& selfIntersection);
 
 	void reset();
@@ -43,6 +45,7 @@ public:
 	int inc_count_;
 
 private:
+	std::vector<GU::Intersection> intersections_;
 	std::vector<EventNode*> all_event_node;
 	std::vector<StatusNode*> all_status_node;
 	std::vector<Segment*> all_seg_node;

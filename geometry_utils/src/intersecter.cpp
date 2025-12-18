@@ -290,10 +290,14 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 	}
 	else {
 		// 将ev1断开
+		bool inc_added = false;
 		if (inc.alongA >= EPS && inc.alongA - 1 <= -EPS) {
 			if (inc.alongB > -EPS && inc.alongB < EPS) {
 				// 交点在A中间B起点 A:event line B:below
 				std::cout << "                                                               inc: " << inc.p << std::endl;
+				if (!inc_added) {
+					intersections_.push_back(inc); inc_added = true;
+				}
 				inc_count_++;
 				Segment* new_seg = new Segment(ev2->seg->start, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
@@ -308,6 +312,9 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 			else if (inc.alongB >= EPS && inc.alongB <= 1- EPS) {
 				std::cout << "                                                               inc: " << inc.p << std::endl;
+				if (!inc_added) {
+					intersections_.push_back(inc); inc_added = true;
+				}
 				inc_count_++;
 				// 交点在A中间B中间，拆分事件线段，更新事件点other
 				Segment* new_seg = new Segment(inc.p, ev1->seg->end);
@@ -327,6 +334,9 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			else if (inc.alongB > 1- EPS && inc.alongB <1+ EPS) {
 				// 交点在A中间B终点 A:event line B:above/below
 				std::cout << "                                                               inc: " << inc.p << std::endl;
+				if (!inc_added) {
+					intersections_.push_back(inc); inc_added = true;
+				}
 				inc_count_++;
 				Segment* new_seg = new Segment(ev2->seg->end, ev1->seg->end);
 				new_seg->myFill = ev1->seg->myFill;
@@ -344,6 +354,9 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 		if (inc.alongB >= EPS && inc.alongB - 1 < -EPS) {
 			if (inc.alongA > -EPS && inc.alongA < EPS) {
 				// 交点在B中间A的起点 A:event B:above
+				if (!inc_added) {
+					intersections_.push_back(inc); inc_added = true;
+				}
 				Segment* new_seg = new Segment(ev1->seg->start, ev2->seg->end);
 				new_seg->myFill = ev2->seg->myFill;
 				//new_seg.otherFill = nullptr;
@@ -357,6 +370,9 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 			else if (inc.alongA >= EPS && inc.alongA <= 1- EPS) {
 				// 交点在B中间A中间 拆分状态线段，更新状态线段other事件点，新增事件线段
+				if (!inc_added) {
+					intersections_.push_back(inc); inc_added = true;
+				}
 				Segment* new_seg = new Segment(inc.p, ev2->seg->end);
 				new_seg->myFill = ev2->seg->myFill;
 				//new_seg.otherFill = nullptr;
@@ -370,6 +386,9 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 			else if (inc.alongA > 1- EPS && inc.alongA < 1+ EPS) {
 				// 交点在B中间A的终点 A:event B:above/below
+				if (!inc_added) {
+					intersections_.push_back(inc); inc_added = true;
+				}
 				Segment* new_seg = new Segment(ev1->seg->end, ev2->seg->end);
 				new_seg->myFill = ev2->seg->myFill;
 				//new_seg.otherFill = nullptr;
@@ -604,6 +623,105 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 	}
 	
 	return segments;
+}
+
+std::vector<GU::Intersection> Intersecter::calcIntersect() {
+	intersections_.clear();
+	// 状态列表中只会插入起点事件点
+	StatusList status_list = StatusList();
+	std::vector<Segment*> segments;
+	int iter_num = 0;
+	while (!event_list.isEmpty()) {
+		EventNode* ev = event_list.getHead();
+		std::cout << "iter " << iter_num << std::endl;
+		std::cout << "cur-----event list-----" << std::endl;
+		std::cout << ">>";
+		event_list.printList();
+		std::cout << "-----------------------" << std::endl;
+		iter_num++;
+		if (ev->isStart) {
+			// ev: 线段起点事件
+			// 1、从状态集中搜索事件点上方和下方的事件点(空间位置,下方包括共线)
+			StatusNode* prev = status_list.root;
+			StatusNode* here = status_list.root->next;
+			while (here != nullptr) {
+				if (statusCompare(ev, here->ev) == 1) {
+					break;
+				}
+				prev = here;
+				here = here->next;
+			}
+			EventNode* above = prev == status_list.root ? nullptr : prev->ev;
+			EventNode* below = here != nullptr ? here->ev : nullptr;
+
+			// 2、计算事件点(起点)所在线段与上下状态线段的交点(空间位置)
+			EventNode* eve = checkBothIntersections(ev, above, below);
+			if (eve) {
+				std::cout << "                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos << std::endl;
+				event_list.detach(ev->other);
+				event_list.detach(ev);
+			}
+
+			if (event_list.getHead() != ev) {
+				// something was inserted before us in the event queue, so loop back around and
+				// process it before continuing
+				std::cout << " ---------something was inserted before event_list---------- " << std::endl;
+				std::cout << "------event list-------" << std::endl;
+				event_list.printList();
+				std::cout << "-----------------------" << std::endl;
+				std::cout << "update   status list  " << std::endl;
+				status_list.printList();
+				std::cout << "-----------------------" << std::endl;
+				std::cout << std::endl;
+				continue;
+			}
+
+			// 根据当前事件点创建状态点并接入状态链表
+			StatusNode* new_stat_node = new StatusNode();
+			new_stat_node->ev = ev; // 状态点对应的事件点
+			new_stat_node->prev = prev; // 上一个状态点
+			new_stat_node->next = here; // 下一个状态点
+			prev->next = new_stat_node; // 更新上一状态点(上一状态点next指向当前新建的状态点)
+			if (here != nullptr) {
+				here->prev = new_stat_node;
+			}
+			ev->other->status = new_stat_node; // 终点事件点的状态=随着起点事件新建的状态点(方便后续状态点删除操作)
+			all_status_node.push_back(new_stat_node);
+		}
+		else {
+			// ev: 线段终点事件
+			std::cout << "end ev :" << ev->pos << " -> " << ev->other->pos << std::endl;
+			StatusNode* st = ev->status;
+			if (st == nullptr) {
+				reset();
+				throw std::runtime_error("PolyBool: Zero-length segment detected; your epsilon is probably too small or too large");
+			}
+
+			if (status_list.exists(st->prev) && (status_list.exists(st->next))) {
+				eventsIntersection(st->prev->ev, st->next->ev);
+			}
+
+			segments.push_back(ev->seg);
+
+			status_list.detach(st); // 状态删除
+		}
+		event_list.detach(event_list.getHead());
+
+		// *****************debug*****************
+		std::cout << std::endl;
+		if (true) {
+			//std::cout << "update   event list   " << std::endl;
+			//event_list.printList();
+			//std::cout << "-----------------------" << std::endl;
+			std::cout << "update   status list  " << std::endl;
+			status_list.printList();
+			std::cout << "-----------------------" << std::endl;
+		}
+		std::cout << std::endl;
+		std::cout << std::endl;
+		// *****************debug*****************
+	}
+	return intersections_;
 }
 
 void Intersecter::reset() {

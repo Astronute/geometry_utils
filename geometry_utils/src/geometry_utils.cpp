@@ -123,7 +123,6 @@ GU::Intersection GeometryUtils::calc_linesIntersect(const GU::Line& lineA, const
     return inc;
 }
 
-
 GU::Node* GeometryUtils::nextNonIntersection(GU::Node* n){
     GU::Node* node = n;
     do{
@@ -438,6 +437,14 @@ void GeometryUtils::sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary) 
         std::reverse(boundary.begin(), boundary.end());
     }
 
+}
+
+std::vector<GU::Intersection> GeometryUtils::calc_geometryIntersection(const std::vector<GU::Point>& region) {
+
+    Intersecter intersecter;
+    intersecter.addRegion(region, true);
+
+    return intersecter.calcIntersect();
 }
 
 std::vector<std::vector<GU::Point>> GeometryUtils::calc_AnotB(const std::vector<GU::Point>& region_0, const std::vector<GU::Point>& region_1) {

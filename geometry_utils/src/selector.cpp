@@ -200,3 +200,7 @@ std::vector<std::deque<GU::Point>> SegmentSelector::segmentChain(const std::vect
 
     return polygons;
 }
+
+std::vector<std::deque<GU::Point>> SegmentSelector::segmentChain(const std::vector<GU::Point>& polygon) {
+
+}
