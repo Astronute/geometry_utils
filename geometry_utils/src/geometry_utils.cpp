@@ -453,7 +453,8 @@ double GeometryUtils::polygonArea(const std::vector<GU::Point>& region) {
 std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>& polygon, double gap) {
     std::vector<GU::Point> filter_vertex;
 
-    if (polygon.size() < 3) {
+    int len = polygon.size();
+    if (len < 3) {
         std::cout << " Invalid polygon: fewer than 3 vertices " << std::endl;
         return filter_vertex;
     }
@@ -466,12 +467,22 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
         return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
         };
 
-    GU::Point cur, pre;
-    pre = polygon[polygon.size()-1];
-    filter_vertex.push_back(polygon[0]);
-    for (int i = 0; i < polygon.size(); ++i) {
+    GU::Point cur, pre, next;
+    
+    pre = polygon[len - 1];
+    for (int i = 0; i < len; ++i) {
+        double dx1, dy1, dx2, dy2, cross;
+
         cur = polygon[i];
-        if (norm(cur, pre) > gap) {
+        next = polygon[(i + 1) % len];
+        dx1 = pre.x - cur.x; dy1 = pre.y - cur.y;
+        dx2 = next.x - cur.x; dy2 = next.y - cur.y;
+        cross = dx1 * dy2 - dy1 * dx2;
+
+        if (std::fabs(cross) < 1e-7 || norm(cur, pre) < gap) {
+            std::cout << " clean p: " << cur << std::endl;
+        }
+        else {
             filter_vertex.push_back(cur);
         }
         pre = cur;
@@ -487,7 +498,6 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
         filter_vertex.clear();
         return filter_vertex;
     }
-
 
 
     return filter_vertex;

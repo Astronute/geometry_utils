@@ -27,8 +27,9 @@ void main() {
     std::vector<GU::Point> region_1{ GU::Point(0, 0),
                                        GU::Point(10, 0),
                                        GU::Point(10, 7),
-                                       GU::Point(10, 0),
-                                       GU::Point(0, 5)
+                                       GU::Point(10, 9),
+                                       GU::Point(0, 5),
+                                        GU::Point(0, 5.01)
     };
 
     //std::vector<GU::Point> region_0{ GU::Point(-104.297369, 29.360241),
@@ -73,9 +74,9 @@ void main() {
     //    }
     //}
 
-    std::vector<GU::Intersection> incs = GU.calc_geometryIntersection(region_1);
-    for (auto inc : incs) {
-        std::cout << "inc: " << inc.p << std::endl;
+    std::vector<GU::Point> f_reg = GU.polygonFilter(region_1, 0.1);
+    for (auto p : f_reg) {
+        std::cout << "p: " << p << std::endl;
     }
     
     std::cout << "s: " << GU.polygonArea(region_1) << std::endl;
