@@ -29,3 +29,4 @@ set_target_properties(geometry_utils PROPERTIES
     VERSION ${PROJECT_VERSION}                                # 库版本（如libgeometry_utils.so.1.0）
     SOVERSION 1                                               # API版本（如libgeometry_utils.so.1）
 )
+
