@@ -118,7 +118,6 @@ std::vector<std::deque<GU::Point>> SegmentSelector::segmentChain(const std::vect
             GU::Point vec_c = normalized(grow2, grow);
             GU::Point vec_p = normalized(grow, pt);
             double cross1 = vec_c(0) * vec_p(1) - vec_c(1) * vec_p(0);
-            std::cout << "cross : " << cross1 << std::endl;
             // 线段匹配点与链的头/尾共线，删除头尾点
             if (std::fabs(cross1) < 1e-1) {
                 if (addToHead) {
