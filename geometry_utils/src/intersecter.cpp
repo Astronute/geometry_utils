@@ -294,7 +294,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 		if (inc.alongA >= EPS && inc.alongA - 1 <= -EPS) {
 			if (inc.alongB > -EPS && inc.alongB < EPS) {
 				// 交点在A中间B起点 A:event line B:below
-				std::cout << "                                                               inc: " << inc.p << std::endl;
+				DEBUG_PRINT("                                                               inc: " << inc.p);
 				if (!inc_added) {
 					intersections_.push_back(inc); inc_added = true;
 				}
@@ -311,7 +311,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 				eventAddSegment(new_seg, ev1->primary);
 			}
 			else if (inc.alongB >= EPS && inc.alongB <= 1- EPS) {
-				std::cout << "                                                               inc: " << inc.p << std::endl;
+				DEBUG_PRINT("                                                               inc: " << inc.p);
 				if (!inc_added) {
 					intersections_.push_back(inc); inc_added = true;
 				}
@@ -333,7 +333,7 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 			}
 			else if (inc.alongB > 1- EPS && inc.alongB <1+ EPS) {
 				// 交点在A中间B终点 A:event line B:above/below
-				std::cout << "                                                               inc: " << inc.p << std::endl;
+				DEBUG_PRINT("                                                               inc: " << inc.p);
 				if (!inc_added) {
 					intersections_.push_back(inc); inc_added = true;
 				}
@@ -459,15 +459,15 @@ void Intersecter::addRegion(const std::vector<GU::Point>& region, const bool& pr
 
 EventNode* Intersecter::checkBothIntersections(EventNode* ev, EventNode* above, EventNode* below) {
 	if (above) {
-		std::cout << "above: " << above->pos << " -> " << above->other->pos << std::endl;
+		DEBUG_PRINT("above: " << above->pos << " -> " << above->other->pos);
 		EventNode* eve = eventsIntersection(ev, above);
 		if (eve) {
-			std::cout << "                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos << std::endl;
+			DEBUG_PRINT("                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos);
 			return eve;
 		}
 	}
 	if (below) {
-		std::cout << "below: " << below->pos << " -> " << below->other->pos << std::endl;
+		DEBUG_PRINT("below: " << below->pos << " -> " << below->other->pos);
 		return eventsIntersection(ev, below);
 	}
 	return nullptr;
@@ -481,11 +481,11 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 	int iter_num = 0;
 	while (!event_list.isEmpty()) {
 		EventNode* ev = event_list.getHead();
-		std::cout << "iter " << iter_num << std::endl;
-		std::cout << "cur-----event list-----" << std::endl;
-		std::cout << ">>";
+		DEBUG_PRINT("iter " << iter_num);
+		DEBUG_PRINT("cur-----event list-----");
+		DEBUG_PRINT_OLDLINE(">>");
 		event_list.printList();
-		std::cout << "-----------------------" << std::endl;
+		DEBUG_PRINT("-----------------------");
 		iter_num++;
 		if (ev->isStart) {
 			// ev: 线段起点事件
@@ -505,7 +505,7 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 			// 2、计算事件点(起点)所在线段与上下状态线段的交点(空间位置)
 			EventNode* eve = checkBothIntersections(ev, above, below);
 			if (eve) {
-				std::cout << "                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos << std::endl;
+				DEBUG_PRINT("                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos);
 				if (!selfIntersection) {
 					eve->seg->otherFill = ev->seg->myFill;
 				}
@@ -516,14 +516,14 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 			if (event_list.getHead() != ev) {
 				// something was inserted before us in the event queue, so loop back around and
 				// process it before continuing
-				std::cout << " ---------something was inserted before event_list---------- " << std::endl;
-				std::cout << "------event list-------" << std::endl;
+				DEBUG_PRINT(" ---------something was inserted before event_list---------- ");
+				DEBUG_PRINT("------event list-------");
 				event_list.printList();
-				std::cout << "-----------------------" << std::endl;
-				std::cout << "update   status list  " << std::endl;
+				DEBUG_PRINT("-----------------------");
+				DEBUG_PRINT("update   status list  ");
 				status_list.printList();
-				std::cout << "-----------------------" << std::endl;
-				std::cout << std::endl;
+				DEBUG_PRINT("-----------------------");
+				DEBUG_PRINT_NEWLINE();
 				continue;
 			}
 
@@ -584,7 +584,7 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 		}
 		else {
 			// ev: 线段终点事件
-			std::cout << "end ev :" << ev->pos << " -> " << ev->other->pos << std::endl;
+			DEBUG_PRINT("end ev :" << ev->pos << " -> " << ev->other->pos);
 			StatusNode* st = ev->status;
 			if (st == nullptr) {
 				reset();
@@ -608,17 +608,17 @@ std::vector<Segment*> Intersecter::calculate(const bool& selfIntersection) {
 		event_list.detach(event_list.getHead());
 
 		// *****************debug*****************
-		std::cout << std::endl;
+		DEBUG_PRINT_NEWLINE();
 		if (true) {
 			//std::cout << "update   event list   " << std::endl;
 			//event_list.printList();
 			//std::cout << "-----------------------" << std::endl;
-			std::cout << "update   status list  " << std::endl;
+			DEBUG_PRINT("update   status list  ");
 			status_list.printList();
-			std::cout << "-----------------------" << std::endl;
+			DEBUG_PRINT("-----------------------");
 		}
-		std::cout << std::endl;
-		std::cout << std::endl;
+		DEBUG_PRINT_NEWLINE();
+		DEBUG_PRINT_NEWLINE();
 		// *****************debug*****************
 	}
 	
@@ -633,11 +633,11 @@ std::vector<GU::Intersection> Intersecter::calcIntersect() {
 	int iter_num = 0;
 	while (!event_list.isEmpty()) {
 		EventNode* ev = event_list.getHead();
-		std::cout << "iter " << iter_num << std::endl;
-		std::cout << "cur-----event list-----" << std::endl;
-		std::cout << ">>";
+		DEBUG_PRINT("iter " << iter_num);
+		DEBUG_PRINT("cur-----event list-----");
+		DEBUG_PRINT_OLDLINE(">>");
 		event_list.printList();
-		std::cout << "-----------------------" << std::endl;
+		DEBUG_PRINT("-----------------------");
 		iter_num++;
 		if (ev->isStart) {
 			// ev: 线段起点事件
@@ -657,7 +657,7 @@ std::vector<GU::Intersection> Intersecter::calcIntersect() {
 			// 2、计算事件点(起点)所在线段与上下状态线段的交点(空间位置)
 			EventNode* eve = checkBothIntersections(ev, above, below);
 			if (eve) {
-				std::cout << "                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos << std::endl;
+				DEBUG_PRINT("                                             Overlapping ev: " << eve->pos << " -> " << eve->other->pos);
 				event_list.detach(ev->other);
 				event_list.detach(ev);
 			}
@@ -665,14 +665,14 @@ std::vector<GU::Intersection> Intersecter::calcIntersect() {
 			if (event_list.getHead() != ev) {
 				// something was inserted before us in the event queue, so loop back around and
 				// process it before continuing
-				std::cout << " ---------something was inserted before event_list---------- " << std::endl;
-				std::cout << "------event list-------" << std::endl;
+				DEBUG_PRINT(" ---------something was inserted before event_list---------- ");
+				DEBUG_PRINT("------event list-------");
 				event_list.printList();
-				std::cout << "-----------------------" << std::endl;
-				std::cout << "update   status list  " << std::endl;
+				DEBUG_PRINT("-----------------------");
+				DEBUG_PRINT("update   status list  ");
 				status_list.printList();
-				std::cout << "-----------------------" << std::endl;
-				std::cout << std::endl;
+				DEBUG_PRINT("-----------------------");
+				DEBUG_PRINT_NEWLINE();
 				continue;
 			}
 
@@ -690,7 +690,7 @@ std::vector<GU::Intersection> Intersecter::calcIntersect() {
 		}
 		else {
 			// ev: 线段终点事件
-			std::cout << "end ev :" << ev->pos << " -> " << ev->other->pos << std::endl;
+			DEBUG_PRINT("end ev :" << ev->pos << " -> " << ev->other->pos);
 			StatusNode* st = ev->status;
 			if (st == nullptr) {
 				reset();
@@ -708,17 +708,17 @@ std::vector<GU::Intersection> Intersecter::calcIntersect() {
 		event_list.detach(event_list.getHead());
 
 		// *****************debug*****************
-		std::cout << std::endl;
+		DEBUG_PRINT_NEWLINE();
 		if (true) {
 			//std::cout << "update   event list   " << std::endl;
 			//event_list.printList();
 			//std::cout << "-----------------------" << std::endl;
-			std::cout << "update   status list  " << std::endl;
+			DEBUG_PRINT("update   status list  ");
 			status_list.printList();
-			std::cout << "-----------------------" << std::endl;
+			DEBUG_PRINT("-----------------------");
 		}
-		std::cout << std::endl;
-		std::cout << std::endl;
+		DEBUG_PRINT_NEWLINE();
+		DEBUG_PRINT_NEWLINE();
 		// *****************debug*****************
 	}
 	return intersections_;

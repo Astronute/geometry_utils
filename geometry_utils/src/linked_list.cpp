@@ -13,7 +13,7 @@ bool EventList::exists(EventNode* node) {
 
 bool EventList::detach(EventNode* node) {
 	if (node == nullptr || node == root) {
-		std::cout << " EventList detach Node error" << std::endl;
+		DEBUG_PRINT(" EventList detach Node error");
 		return false;
 	}
 	node->prev->next = node->next;
@@ -54,7 +54,7 @@ void EventList::printList() {
 	EventNode* iter = root->next;
 	while (iter != nullptr) {
 		//if (int(iter->isStart))
-			std::cout << " isstart: " << int(iter->isStart) << ", pos: " << iter->pos << " -> " << iter->other->pos << std::endl;
+		DEBUG_PRINT(" isstart: " << int(iter->isStart) << ", pos: " << iter->pos << " -> " << iter->other->pos);
 		iter = iter->next;
 	}
 }
@@ -75,7 +75,7 @@ bool StatusList::exists(StatusNode* node) {
 
 bool StatusList::detach(StatusNode* node) {
 	if (node == nullptr || node == root) {
-		std::cout << " StatusList detach Node error" << std::endl;
+		DEBUG_PRINT(" StatusList detach Node error");
 		return false;
 	}
 	node->prev->next = node->next;
@@ -101,7 +101,7 @@ void StatusList::remove(StatusNode* node) {
 
 void StatusList::addAbove(StatusNode* above, StatusNode* below) {
 	if (below == root && below == nullptr) {
-		std::cout << " add above illegal " << std::endl;
+		DEBUG_PRINT(" add above illegal ");
 		return;
 	}
 	above->next = below;
@@ -113,7 +113,7 @@ void StatusList::addAbove(StatusNode* above, StatusNode* below) {
 void StatusList::printList() {
 	StatusNode* iter = root->next;
 	while (iter != nullptr) {
-		std::cout << "pos: " << iter->ev->pos << " -> " << iter->ev->other->pos << std::endl;
+		DEBUG_PRINT("pos: " << iter->ev->pos << " -> " << iter->ev->other->pos);
 		iter = iter->next;
 	}
 }

@@ -13,6 +13,17 @@
 #include "intersecter.h"
 #include "selector.h"
 
+#ifdef _DEBUG
+#define DEBUG_PRINT(...) std::cout << "[DEBUG] " << __VA_ARGS__ << std::endl
+#define DEBUG_PRINT_OLDLINE(...) std::cout << "[DEBUG] " << __VA_ARGS__
+#define DEBUG_PRINT_NEWLINE() std::cout << std::endl
+
+#else
+#define DEBUG_PRINT(...)
+#define DEBUG_PRINT_OLDLINE(...)
+#define DEBUG_PRINT_NEWLINE(...)
+#endif
+
 class GeometryUtils{
 public:
 

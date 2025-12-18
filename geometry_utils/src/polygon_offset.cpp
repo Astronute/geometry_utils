@@ -112,7 +112,7 @@ std::vector<GU::Point> PolygonOffset::inflateLines(const std::vector<GU::Point>&
     for (int i = 0; i < invalid_edge_mask.size(); ++i) {
         GU::Line invalid_edge;
         if (invalid_edge_mask[i] && !invalid_edge_mask[((i - 1) + N) % N] && !invalid_edge_mask[(i + 1) % N]) {
-            std::cout << " process case1: " << std::endl;
+            DEBUG_PRINT(" process case1: ");
             GU::Intersection inc = gu.calc_linesIntersect(off_edges[((i - 1) + N) % N], off_edges[(i + 1) % N]);
             off_edges[((i - 1) + N) % N] = GU::Line(off_edges[((i - 1) + N) % N].startX, off_edges[((i - 1) + N) % N].startY, inc.p.x, inc.p.y);
             off_edges[(i + 1) % N] = GU::Line(inc.p.x, inc.p.y, off_edges[(i + 1) % N].endX, off_edges[(i + 1) % N].endY);
@@ -150,7 +150,7 @@ std::vector<GU::Point> PolygonOffset::inflateLines(const std::vector<GU::Point>&
                 }
 
                 if (invalid_index.size() > 1) {
-                    std::cout << " process case2, num: " << invalid_index.size() << std::endl;
+                    DEBUG_PRINT(" process case2, num: " << invalid_index.size());
                     for (int idx : invalid_index) {
                         // ¼ÆËãÎÞÐ§±ßÆ«ÒÆ
                         GU::Vector2d p0_vec = boundary[idx];
@@ -250,7 +250,7 @@ std::vector<std::vector<GU::Point>> PolygonOffset::processRing(const std::vector
         if (area > 0) {
             valid_rings.push_back(r);
         }
-        std::cout << " ring area: " << area << std::endl;
+        DEBUG_PRINT(" ring area: " << area);
     }
 
     return valid_rings;

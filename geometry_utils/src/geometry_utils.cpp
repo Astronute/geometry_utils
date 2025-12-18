@@ -534,8 +534,8 @@ std::vector<std::vector<GU::Point>> GeometryUtils::calc_AnotB(const std::vector<
         seg->otherFill = s->otherFill;
         seg_primary.push_back(seg);
         all_segment_ptr_.push_back(seg);
-        std::cout << "seg:" << s->start << " -> " << s->end <<
-            " my:" << FillInfoToString(s->myFill.above) << ", " << FillInfoToString(s->myFill.below) << std::endl;
+        DEBUG_PRINT("seg:" << s->start << " -> " << s->end <<
+            " my:" << FillInfoToString(s->myFill.above) << ", " << FillInfoToString(s->myFill.below));
     }
     intersecter.reset();
 
@@ -548,8 +548,8 @@ std::vector<std::vector<GU::Point>> GeometryUtils::calc_AnotB(const std::vector<
         seg->otherFill = s->otherFill;
         seg_secondary.push_back(seg);
         all_segment_ptr_.push_back(seg);
-        std::cout << "seg:" << s->start << " -> " << s->end <<
-            " my:" << FillInfoToString(s->myFill.above) << ", " << FillInfoToString(s->myFill.below) << std::endl;
+        DEBUG_PRINT("seg:" << s->start << " -> " << s->end <<
+            " my:" << FillInfoToString(s->myFill.above) << ", " << FillInfoToString(s->myFill.below));
     }
     intersecter.reset();
 
@@ -561,7 +561,7 @@ std::vector<std::vector<GU::Point>> GeometryUtils::calc_AnotB(const std::vector<
     }
     std::vector<Segment*> res_C = intersecter.calculate(false);
     for (auto s : res_C) {
-        std::cout << "seg:" << s->start << " -> " << s->end << std::endl;
+        DEBUG_PRINT("seg:" << s->start << " -> " << s->end);
     }
 
     SegmentSelector selctor;
