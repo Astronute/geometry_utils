@@ -452,7 +452,7 @@ double GeometryUtils::polygonArea(const std::vector<GU::Point>& region) {
 
 std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>& polygon, double gap) {
     std::vector<GU::Point> filter_vertex;
-
+    
     int len = polygon.size();
     if (len < 3) {
         std::cout << " Invalid polygon: fewer than 3 vertices " << std::endl;
@@ -467,26 +467,28 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
         return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
         };
 
-    GU::Point cur, pre, next;
-    
-    pre = polygon[len - 1];
-    for (int i = 0; i < len; ++i) {
-        double dx1, dy1, dx2, dy2, cross;
 
-        cur = polygon[i];
-        next = polygon[(i + 1) % len];
-        dx1 = pre.x - cur.x; dy1 = pre.y - cur.y;
-        dx2 = next.x - cur.x; dy2 = next.y - cur.y;
+    GU::Node* root = upgradePolygon(polygon);
+    GU::Node* cur = root;
+    double dx1, dy1, dx2, dy2, cross;
+    do {
+        cur = cur->next;
+        dx1 = cur->prev->p.x - cur->p.x; dy1 = cur->prev->p.y - cur->p.y;
+        dx2 = cur->next->p.x - cur->p.x; dy2 = cur->next->p.y - cur->p.y;
         cross = dx1 * dy2 - dy1 * dx2;
-
-        if (std::fabs(cross) < 1e-7 || norm(cur, pre) < gap) {
+        if (std::fabs(cross) < 1e-7 || norm(cur->p, cur->prev->p) < gap) {
             std::cout << " clean p: " << cur << std::endl;
+            cur->prev->next = cur->next;
+            cur->next->prev = cur->prev;
         }
-        else {
-            filter_vertex.push_back(cur);
-        }
-        pre = cur;
-    }
+    } while (cur != root);
+
+    GU::Node* p_vertex = root;
+    do {
+        filter_vertex.push_back(p_vertex->p);
+        p_vertex = p_vertex->next;
+    } while (p_vertex != root);
+
     if (filter_vertex.size() < 3) {
         std::cout << " Invalid polygon: fewer than 3 vertices " << std::endl;
         filter_vertex.clear();

@@ -18,19 +18,19 @@
 
 void main() {
     // region test
-    std::vector<GU::Point> region_0{ GU::Point(0, 0),
-                                       GU::Point(10, 0),
-                                       GU::Point(10, 7),
-                                       GU::Point(0, 7)
-    };
+    //std::vector<GU::Point> region_0{ GU::Point(0, 0),
+    //                                   GU::Point(10, 0),
+    //                                   GU::Point(10, 7),
+    //                                   GU::Point(0, 7)
+    //};
 
-    std::vector<GU::Point> region_1{ GU::Point(0, 0),
-                                       GU::Point(10, 0),
-                                       GU::Point(10, 7),
-                                       GU::Point(10, 9),
-                                       GU::Point(0, 5),
-                                        GU::Point(0, 5.01)
-    };
+    //std::vector<GU::Point> region_1{ GU::Point(0, 0),
+    //                                   GU::Point(10, 0),
+    //                                   GU::Point(10, 7),
+    //                                   GU::Point(10, 9),
+    //                                   GU::Point(0, 5),
+    //                                    GU::Point(0, 5.01)
+    //};
 
     //std::vector<GU::Point> region_0{ GU::Point(-104.297369, 29.360241),
     //                                GU::Point(-46.385867, 66.161903),
@@ -38,10 +38,11 @@ void main() {
     //                                GU::Point(9.097088, -27.804012),
     //                                GU::Point(-60.583526, -49.100576)
     //                                };
-    //std::vector<GU::Point> region_1{ GU::Point(-61.330771, 16.843911),
-    //                                GU::Point(-37.792548, 19.085643),
-    //                                GU::Point(-48.440791, 1.338586)
-    //};
+    std::vector<GU::Point> region_1{ GU::Point(-28.360606, -4.581204),
+                                    GU::Point(-20.359008, -0.638443),
+                                    GU::Point(-22.922546, -10.702858),
+                                    GU::Point(-28.360606, -4.581204)
+    };
     //std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
     //                                    cv::Point(22.0138,  1.4954),
     //                                    cv::Point(44.6356, -1.01814),
