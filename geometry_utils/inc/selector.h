@@ -19,8 +19,6 @@ public:
 
     std::vector<std::deque<GU::Point>> segmentChain(const std::vector<Segment>& segments);
 
-    std::vector<std::deque<GU::Point>> segmentChain(const std::vector<GU::Point>& polygon);
-
     // ring A - B
     Eigen::Matrix4i difference() {
         Eigen::Matrix4i select;

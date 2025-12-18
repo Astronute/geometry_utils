@@ -77,10 +77,8 @@ void main() {
     for (auto inc : incs) {
         std::cout << "inc: " << inc.p << std::endl;
     }
-    GU.sort_polygon_vertices_ccw(region_1);
-    for (auto p : region_1) {
-        std::cout << p << std::endl;
-    }
+    
+    std::cout << "s: " << GU.polygonArea(region_1) << std::endl;
 
     delete[] fast_region;
 }

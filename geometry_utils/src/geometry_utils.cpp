@@ -445,8 +445,52 @@ double GeometryUtils::polygonArea(const std::vector<GU::Point>& region) {
     double Sx2 = 0.0;
     for (int i = 0; i < region.size(); ++i) {
         Sx2 += (region[(i + 1) % len](0) - region[i](0)) * (region[(i + 1) % len](1) + region[i](1));
+        std::cout << Sx2 << std::endl;
     }
     return Sx2 / 2.0;
+}
+
+std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>& polygon, double gap) {
+    std::vector<GU::Point> filter_vertex;
+
+    if (polygon.size() < 3) {
+        std::cout << " Invalid polygon: fewer than 3 vertices " << std::endl;
+        return filter_vertex;
+    }
+    // |p1-p2|^2
+    auto norm2 = [](const GU::Point& p1, const GU::Point& p2) -> double {
+        return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+        };
+    // |p1-p2|
+    auto norm = [](const GU::Point& p1, const GU::Point& p2) -> double {
+        return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+        };
+
+    GU::Point cur, pre;
+    pre = polygon[polygon.size()-1];
+    filter_vertex.push_back(polygon[0]);
+    for (int i = 0; i < polygon.size(); ++i) {
+        cur = polygon[i];
+        if (norm(cur, pre) > gap) {
+            filter_vertex.push_back(cur);
+        }
+        pre = cur;
+    }
+    if (filter_vertex.size() < 3) {
+        std::cout << " Invalid polygon: fewer than 3 vertices " << std::endl;
+        filter_vertex.clear();
+        return filter_vertex;
+    }
+
+    if (calc_geometryIntersection(filter_vertex).size() > 0) {
+        std::cout << " Invalid polygon: self intersection " << std::endl;
+        filter_vertex.clear();
+        return filter_vertex;
+    }
+
+
+
+    return filter_vertex;
 }
 
 std::vector<GU::Intersection> GeometryUtils::calc_geometryIntersection(const std::vector<GU::Point>& region) {
