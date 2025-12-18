@@ -439,6 +439,16 @@ void GeometryUtils::sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary) 
 
 }
 
+double GeometryUtils::polygonArea(const std::vector<GU::Point>& region) {
+    int len = region.size();
+
+    double Sx2 = 0.0;
+    for (int i = 0; i < region.size(); ++i) {
+        Sx2 += (region[(i + 1) % len](0) - region[i](0)) * (region[(i + 1) % len](1) + region[i](1));
+    }
+    return Sx2 / 2.0;
+}
+
 std::vector<GU::Intersection> GeometryUtils::calc_geometryIntersection(const std::vector<GU::Point>& region) {
 
     Intersecter intersecter;

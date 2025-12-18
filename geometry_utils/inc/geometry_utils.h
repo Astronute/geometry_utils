@@ -37,6 +37,8 @@ public:
 
     std::vector<GU::Intersection> calc_geometryIntersection(const std::vector<GU::Point>& region);
 
+    double polygonArea(const std::vector<GU::Point>& region);
+
     std::vector<GU::Point> simplifyCurve(const std::vector<GU::Point>& curve, double epsilon);
 
     bool calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon);
