@@ -38,10 +38,11 @@ void main() {
     //                                GU::Point(9.097088, -27.804012),
     //                                GU::Point(-60.583526, -49.100576)
     //                                };
-    std::vector<GU::Point> region_1{ GU::Point(-28.360606, -4.581204),
-                                    GU::Point(-20.359008, -0.638443),
-                                    GU::Point(-22.922546, -10.702858),
-                                    GU::Point(-28.360606, -4.581204)
+    std::vector<GU::Point> region_1{ GU::Point(-87.516927557055908, 46.705449594072263),
+                                    GU::Point(-42.083757051684763, 46.705449594072263),
+                                    GU::Point(12.005232420174487, 26.017181756584385),
+                                    GU::Point(8.5384297430614993, -30.371581978777002),
+                                    GU::Point(-47.718026933643579, -69.619465355128753)
     };
     //std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
     //                                    cv::Point(22.0138,  1.4954),
@@ -66,21 +67,16 @@ void main() {
     //    }
     //    std::cout << std::endl;
     //}
-    //PolygonOffset po;
-    //std::vector<std::vector<GU::Point>> rings = po.inflatePolygon(region_1, 1.0);
-    //for (int i = 0; i < rings.size(); ++i) {
-    //    std::cout << "ring : " << i << std::endl;
-    //    for (int j = 0; j < rings[i].size(); ++j) {
-    //        std::cout << rings[i][j] << std::endl;
-    //    }
-    //}
-
-    std::vector<GU::Point> f_reg = GU.polygonFilter(region_1, 0.1);
-    for (auto p : f_reg) {
-        std::cout << "p: " << p << std::endl;
+    PolygonOffset po;
+    std::vector<GU::Point> target_polygon = GU.polygonFilter(region_1, 0.1);
+    std::vector<std::vector<GU::Point>> rings = po.inflatePolygon(target_polygon, 1.0);
+    for (int i = 0; i < rings.size(); ++i) {
+        std::cout << "ring : " << i << std::endl;
+        for (int j = 0; j < rings[i].size(); ++j) {
+            std::cout << rings[i][j] << std::endl;
+        }
     }
-    
-    std::cout << "s: " << GU.polygonArea(region_1) << std::endl;
+
 
     delete[] fast_region;
 }

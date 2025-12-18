@@ -477,7 +477,6 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
         dx2 = cur->next->p.x - cur->p.x; dy2 = cur->next->p.y - cur->p.y;
         cross = dx1 * dy2 - dy1 * dx2;
         if (std::fabs(cross) < 1e-7 || norm(cur->p, cur->prev->p) < gap) {
-            std::cout << " clean p: " << cur << std::endl;
             cur->prev->next = cur->next;
             cur->next->prev = cur->prev;
         }
@@ -504,7 +503,11 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
         filter_vertex.clear();
         return filter_vertex;
     }
-
+    double area = polygonArea(filter_vertex);
+    if (area > 0) {
+        std::reverse(filter_vertex.begin(), filter_vertex.end());
+    }
+    std::cout << "area: " << area << std::endl;
 
     return filter_vertex;
 }
