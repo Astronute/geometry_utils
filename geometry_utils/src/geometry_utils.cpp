@@ -445,7 +445,7 @@ double GeometryUtils::polygonArea(const std::vector<GU::Point>& region) {
     double Sx2 = 0.0;
     for (int i = 0; i < region.size(); ++i) {
         Sx2 += (region[(i + 1) % len](0) - region[i](0)) * (region[(i + 1) % len](1) + region[i](1));
-        std::cout << Sx2 << std::endl;
+        //std::cout << Sx2 << std::endl;
     }
     return Sx2 / 2.0;
 }
