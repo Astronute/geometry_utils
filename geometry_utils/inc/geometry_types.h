@@ -83,6 +83,8 @@ namespace GU {
             return Vector2d(this->x/val, this->y/val);
         }
 
+        friend std::ostream& operator<<(std::ostream& os, const Point& p);
+
         double norm() {
             return std::sqrt(x*x+y*y);
         }
@@ -105,6 +107,11 @@ namespace GU {
 
         double x, y;
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const Vector2d& vec) {
+        os << "(" << vec.x << ", " << vec.y << ")";
+        return os;
+    }
 
     struct Intersection {
         Point p;

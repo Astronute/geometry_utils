@@ -32,9 +32,15 @@ void main() {
     //                                    GU::Point(0, 5.01)
     //};
 
-    std::vector<GU::Point> region_0{ GU::Point(4.2081311318029035, -24.745479517129429),
-                                    GU::Point(10.053044741682362, -28.257723944525772),
-                                    GU::Point(14.872101007735719, -22.600496526706642)
+    std::vector<GU::Point> region_0{ GU::Point(-7.4851390970052671, -24.418511121829106),
+                                    GU::Point(-11.27574765540259, -26.007220685189687),
+                                    GU::Point(-12.171726914260006, -24.656929036180731),
+                                    GU::Point(-13.241097400458015, -25.156940005722962),
+                                    GU::Point(-12.892083595728176, -25.522969043680618),
+                                    GU::Point(-9.9683289932159873, -26.786619368045805),
+                                    GU::Point(-12.223360264880814, -28.565141113635775),
+                                    GU::Point(-12.172637475308379, -28.735001740288805),
+                                    GU::Point(-6.6135956372715992, -25.81911899403331)
                                     };
     std::vector<GU::Point> region_1{ GU::Point(-87.516927557055908, 46.705449594072263),
                                     GU::Point(-42.083757051684763, 46.705449594072263),
@@ -56,8 +62,6 @@ void main() {
         fast_region[2 * i] = region_1[i].x;
         fast_region[2 * i + 1] = region_1[i].y;
     }
-
-    std::cout << GU.calc_line_cross_polygon(GU::Line(8.83592, -22.2846, 13.1516, -24.6203), region_0) << std::endl;
     
     //std::vector<std::vector<GU::Point>> polygons = GU.calc_AnotB(region_0, region_1);
     //for (int i = 0; i < polygons.size(); ++i) {
@@ -67,15 +71,15 @@ void main() {
     //    }
     //    std::cout << std::endl;
     //}
-    //PolygonOffset po;
-    //std::vector<GU::Point> target_polygon = GU.polygonFilter(region_1, 0.1);
-    //std::vector<std::vector<GU::Point>> rings = po.inflatePolygon(target_polygon, 1.0);
-    //for (int i = 0; i < rings.size(); ++i) {
-    //    std::cout << "ring : " << i << std::endl;
-    //    for (int j = 0; j < rings[i].size(); ++j) {
-    //        std::cout << rings[i][j] << std::endl;
-    //    }
-    //}
+    PolygonOffset po;
+    //std::vector<GU::Point> target_polygon = GU.polygonFilter(region_0, 0.1);
+    std::vector<std::vector<GU::Point>> rings = po.inflatePolygon(region_0, 1.0);
+    for (int i = 0; i < rings.size(); ++i) {
+        std::cout << "ring : " << i << std::endl;
+        for (int j = 0; j < rings[i].size(); ++j) {
+            std::cout << rings[i][j] << std::endl;
+        }
+    }
 
 
     delete[] fast_region;

@@ -259,7 +259,11 @@ std::vector<std::vector<GU::Point>> PolygonOffset::processRing(const std::vector
 std::vector<std::vector<GU::Point>> PolygonOffset::inflatePolygon(const std::vector<GU::Point>& polygon, const double offset) {
     std::vector<std::vector<GU::Point>> res;
 
+    GeometryUtils gu;
     // 边界偏移，去除无效线段
+    if (std::fabs(gu.polygonArea(polygon)) < 16.0) {
+        return res;
+    }
     std::vector<GU::Point> valid_points = inflateLines(polygon, offset);
     if (valid_points.size() >= 3) {
         // 去除无效环
@@ -269,3 +273,31 @@ std::vector<std::vector<GU::Point>> PolygonOffset::inflatePolygon(const std::vec
         return res;
     }
 }
+
+
+//std::vector<GU::Point> PolygonOffset::testOffsetPolygon(const std::vector<GU::Point>& polygon, const double offset) {
+//    std::vector<GU::Point> res;
+//
+//    GeometryUtils gu;
+//
+//    int N = polygon.size();
+//    std::vector<GU::Line> offset_lines;
+//    for (int i = 0; i < N; ++i) {
+//        GU::Vector2d p0_vec = polygon[i];
+//        GU::Vector2d p1_vec = polygon[(i + 1) % N];
+//        GU::Vector2d T_vec = (p1_vec - p0_vec).normalized();
+//        GU::Vector2d N_vec = GU::Vector2d(-1.0 * T_vec(1), T_vec(0)).normalized();
+//        GU::Vector2d new_p0_vec = p0_vec + N_vec * offset;
+//        GU::Vector2d new_p1_vec = p1_vec + N_vec * offset;
+//        GU::Line line = GU::Line(new_p0_vec, new_p1_vec);
+//        offset_lines.push_back(line);
+//        DEBUG_PRINT(new_p0_vec << " -> " << new_p1_vec);
+//    }
+//
+//    for (int i = 0; i < offset_lines.size(); ++i) {
+//        GU::Intersection inc = gu.calc_linesIntersect(offset_lines[i], offset_lines[(i+1)% offset_lines.size()]);
+//        DEBUG_PRINT("p: " << inc.p << " alongA: " << inc.alongA << " alongB: " << inc.alongB);
+//    }
+//
+//    return res;
+//}

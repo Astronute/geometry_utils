@@ -19,6 +19,12 @@
 #define DEBUG_PRINT_NEWLINE(...)
 #endif
 
+enum PLType {
+	TIP, // 相交
+	PFIP, // 延长线相交，交点在正方向
+	NFIP  // 延长线相交，交点在负方向
+};
+
 class PolygonOffset {
 public:
 	PolygonOffset();
@@ -32,7 +38,7 @@ public:
 
 	std::unordered_map<int, std::vector<GU::Point>> getIntersectionPoints(const std::vector<GU::Point>& polygon);
 
-
+	//std::vector<GU::Point> testOffsetPolygon(const std::vector<GU::Point>& polygon, const double offset);
 
 	bool pointsSame(const GU::Point& a, const GU::Point& b);
 
