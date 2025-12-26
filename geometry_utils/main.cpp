@@ -72,14 +72,12 @@ void main() {
     //    std::cout << std::endl;
     //}
     PolygonOffset po;
-    //std::vector<GU::Point> target_polygon = GU.polygonFilter(region_0, 0.1);
-    std::vector<std::vector<GU::Point>> rings = po.inflatePolygon(region_0, 1.0);
-    for (int i = 0; i < rings.size(); ++i) {
-        std::cout << "ring : " << i << std::endl;
-        for (int j = 0; j < rings[i].size(); ++j) {
-            std::cout << rings[i][j] << std::endl;
-        }
-    }
+    std::vector<GU::Point> target_polygon = GU.polygonFilter(region_0, 0.1);
+    auto rs = po.inflatePolygon(region_0, 0.8);
+    //std::vector<GU::Point> rings = po.testOffsetPolygon(region_0, 0.8);
+    //for (int j = 0; j < rings.size(); ++j) {
+    //    std::cout << rings[j] << std::endl;
+    //}
 
 
     delete[] fast_region;
