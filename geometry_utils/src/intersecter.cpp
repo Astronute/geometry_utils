@@ -408,9 +408,10 @@ EventNode* Intersecter::eventsIntersection(EventNode* ev1, EventNode* ev2) {
 }
 
 void Intersecter::eventAddSegment(Segment* const seg, const bool &primary) {
+	int pc = pointsCompare(seg->start, seg->end);
 	// add seg start
 	EventNode* startnode = new EventNode();
-	startnode->isStart = true;
+	startnode->isStart = pc == -1 ? true : false;
 	startnode->pos = seg->start;
 	startnode->seg = seg;
 	startnode->primary = primary;
@@ -420,7 +421,7 @@ void Intersecter::eventAddSegment(Segment* const seg, const bool &primary) {
 	// add seg end
 	EventNode* endnode = new EventNode();
 	startnode->other = endnode;
-	endnode->isStart = false;
+	endnode->isStart = pc == -1 ? false : true;
 	endnode->pos = seg->end;
 	endnode->seg = seg;
 	endnode->primary = primary;

@@ -274,6 +274,9 @@ std::vector<std::vector<GU::Point>> PolygonOffset::inflatePolygon(const std::vec
     }
 }
 
+void PolygonOffset::createPolygonSkeleton(const std::vector<GU::Point>& polygon) {
+    
+}
 
 std::vector<GU::Point> PolygonOffset::testOffsetPolygon(const std::vector<GU::Point>& polygon, const double offset) {
     std::vector<GU::Point> res;

@@ -38,6 +38,8 @@ public:
 
 	std::unordered_map<int, std::vector<GU::Point>> getIntersectionPoints(const std::vector<GU::Point>& polygon);
 
+	void createPolygonSkeleton(const std::vector<GU::Point>& polygon);
+
 	std::vector<GU::Point> testOffsetPolygon(const std::vector<GU::Point>& polygon, const double offset);
 
 	bool pointsSame(const GU::Point& a, const GU::Point& b);

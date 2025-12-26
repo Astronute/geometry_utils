@@ -32,21 +32,17 @@ void main() {
     //                                    GU::Point(0, 5.01)
     //};
 
-    std::vector<GU::Point> region_0{ GU::Point(-7.4851390970052671, -24.418511121829106),
-                                    GU::Point(-11.27574765540259, -26.007220685189687),
-                                    GU::Point(-12.171726914260006, -24.656929036180731),
-                                    GU::Point(-13.241097400458015, -25.156940005722962),
-                                    GU::Point(-12.892083595728176, -25.522969043680618),
-                                    GU::Point(-9.9683289932159873, -26.786619368045805),
-                                    GU::Point(-12.223360264880814, -28.565141113635775),
-                                    GU::Point(-12.172637475308379, -28.735001740288805),
-                                    GU::Point(-6.6135956372715992, -25.81911899403331)
+    std::vector<GU::Point> region_0{ GU::Point(43.116028440043323, 19.843321803805768),
+                                    GU::Point(38.73416055080979, 25.455209329963878),
+                                    GU::Point(7.361910439408538, 23.630335169781997),
+                                    GU::Point(6.9659761518011978, 21.460745702264255),
+                                    GU::Point(44.902663113649666, 21.460745702264255),
+                                    GU::Point(44.902663113649673, 17.578843467967129)
                                     };
-    std::vector<GU::Point> region_1{ GU::Point(-87.516927557055908, 46.705449594072263),
-                                    GU::Point(-42.083757051684763, 46.705449594072263),
-                                    GU::Point(12.005232420174487, 26.017181756584385),
-                                    GU::Point(8.5384297430614993, -30.371581978777002),
-                                    GU::Point(-47.718026933643579, -69.619465355128753)
+    std::vector<GU::Point> region_1{ GU::Point(6.1006657784124165, -1.7133066920493876),
+                                    GU::Point(42.902663113649666, -1.7133066920493876),
+                                    GU::Point(42.902663113649666, 19.460745702264255),
+                                    GU::Point(6.1006657784124165, 19.460745702264255)
     };
     //std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
     //                                    cv::Point(22.0138,  1.4954),
@@ -63,22 +59,14 @@ void main() {
         fast_region[2 * i + 1] = region_1[i].y;
     }
     
-    //std::vector<std::vector<GU::Point>> polygons = GU.calc_AnotB(region_0, region_1);
-    //for (int i = 0; i < polygons.size(); ++i) {
-    //    GU.sort_polygon_vertices_ccw(polygons[i]);
-    //    for (auto p : polygons[i]) {
-    //        std::cout << "polygon " << i << ": " << p << std::endl;
-    //    }
-    //    std::cout << std::endl;
-    //}
-    PolygonOffset po;
-    std::vector<GU::Point> target_polygon = GU.polygonFilter(region_0, 0.1);
-    auto rs = po.inflatePolygon(region_0, 0.8);
-    //std::vector<GU::Point> rings = po.testOffsetPolygon(region_0, 0.8);
-    //for (int j = 0; j < rings.size(); ++j) {
-    //    std::cout << rings[j] << std::endl;
-    //}
-
+    std::vector<std::vector<GU::Point>> polygons = GU.calc_AnotB(region_0, region_1);
+    for (int i = 0; i < polygons.size(); ++i) {
+        GU.sort_polygon_vertices_ccw(polygons[i]);
+        for (auto p : polygons[i]) {
+            std::cout << "polygon " << i << ": " << p << std::endl;
+        }
+        std::cout << std::endl;
+    }
 
     delete[] fast_region;
 }
