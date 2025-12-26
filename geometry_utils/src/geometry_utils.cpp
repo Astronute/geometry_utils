@@ -406,13 +406,17 @@ std::vector<GU::Point> GeometryUtils::simplifyCurve(const std::vector<GU::Point>
 //GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
 
 bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon) {
+    int len = polygon.size();
+    if (len < 3) {
+        return false;
+    }
     double s_in = pointInPolygon(GU::Point(line.startX, line.startY), polygon, false);
     double end_in = pointInPolygon(GU::Point(line.endX, line.endY), polygon, false);
     if (s_in* end_in==-1) {
         return true;
     }
 
-    int len = polygon.size();
+    
     GU::Point v0, v = polygon[len - 1];
     for (int i = 0; i < len; ++i) {
         v0 = v;
