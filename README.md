@@ -3,10 +3,10 @@
 
 ## build
 
-'cd ./geometry_utils'
+`cd ./geometry_utils`
 
-'sudo mkdir build && cd build'
+`sudo mkdir build && cd build`
 
-'sudo cmake ..'
+`sudo cmake ..`
 
-'sudo make'
+`sudo make`
