@@ -24,6 +24,7 @@ GeometryUtils::~GeometryUtils() {
     all_segment_ptr_.clear();
 }
 
+// 将多边形顶点由数组表示转为单向链表表示
 GU::Node* GeometryUtils::upgradePolygon(const std::vector<GU::Point> &p){
     GU::Node* root = nullptr;
     for(int i=0; i<p.size(); ++i){
@@ -55,7 +56,7 @@ void GeometryUtils::printPolygon(GU::Node* root) {
     } while (p!=root);
 }
 
-// 不包含相交于端点，线段平行重叠
+// 判断两线段是否相交（不包含相交于端点，线段平行重叠）
 bool GeometryUtils::isIntersection(const GU::Line& lineA, const GU::Line& lineB) {
     double dx1, dy1, dx2, dy2;
     // vec line-AB:(dx1, dy1)
@@ -93,6 +94,7 @@ bool GeometryUtils::isIntersection(const GU::Line& lineA, const GU::Line& lineB)
     return true;
 }
 
+// 计算两线段的交点
 GU::Intersection GeometryUtils::calc_linesIntersect(const GU::Line& lineA, const GU::Line& lineB) {
     double dx1 = lineA.endX - lineA.startX;
     double dy1 = lineA.endY - lineA.startY;
@@ -132,7 +134,7 @@ GU::Node* GeometryUtils::nextNonIntersection(GU::Node* n){
     return node;
 }
 
-
+// 计算点到多边形的距离（0:边上 >0:内 <0:外）
 double GeometryUtils::pointInPolygon(const GU::Point&p, GU::Node* root){
     double res = 0;
     int counter = 0;
@@ -349,6 +351,8 @@ double GeometryUtils::pointInPolygon(const double x, const double y, const doubl
     return res;
 }
 
+
+// 曲线抽稀
 std::vector<GU::Point> GeometryUtils::simplifyCurve(const std::vector<GU::Point>& curve, double epsilon) {
     // Douglas-Peuker
     std::vector<GU::Point> dp_path;
@@ -405,6 +409,7 @@ std::vector<GU::Point> GeometryUtils::simplifyCurve(const std::vector<GU::Point>
 //template std::vector<Eigen::Vector2i>
 //GeometryUtils::simplifyCurve<Eigen::Vector2i>(const std::vector<Eigen::Vector2i>& curve, double epsilon);
 
+// 判断线段是否与多边形有交点（不包括整条线段与边重叠）
 bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vector<GU::Point>& polygon) {
     int len = polygon.size();
     if (len < 3) {
@@ -430,6 +435,7 @@ bool GeometryUtils::calc_line_cross_polygon(const GU::Line& line, const std::vec
     return false;
 }
 
+// 将多边形顶点按照逆时针排列
 void GeometryUtils::sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary) {
     int len = boundary.size();
 
@@ -443,6 +449,7 @@ void GeometryUtils::sort_polygon_vertices_ccw(std::vector<GU::Point>& boundary) 
 
 }
 
+// 计算多边形面积
 double GeometryUtils::polygonArea(const std::vector<GU::Point>& region) {
     int len = region.size();
 
@@ -516,6 +523,7 @@ std::vector<GU::Point> GeometryUtils::polygonFilter(const std::vector<GU::Point>
     return filter_vertex;
 }
 
+// 计算多边形自交点
 std::vector<GU::Intersection> GeometryUtils::calc_geometryIntersection(const std::vector<GU::Point>& region) {
 
     Intersecter intersecter;
@@ -524,6 +532,7 @@ std::vector<GU::Intersection> GeometryUtils::calc_geometryIntersection(const std
     return intersecter.calcIntersect();
 }
 
+// 多边形布尔运算：A - B
 std::vector<std::vector<GU::Point>> GeometryUtils::calc_AnotB(const std::vector<GU::Point>& region_0, const std::vector<GU::Point>& region_1) {
     std::vector<std::vector<GU::Point>> res;
 
