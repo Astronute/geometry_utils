@@ -1,8 +1,8 @@
 # geometry_utils
 
 
-# cmake
-
-sudo mkdir build && cd build
-sudo cmake ..
-sudo make
+## build
+'cd ./geometry_utils'
+'sudo mkdir build && cd build'
+'sudo cmake ..'
+'sudo make'
