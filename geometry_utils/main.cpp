@@ -60,6 +60,6 @@ void main() {
     }
     delete[] fast_region;
 
-    std::cout << GU.calc_pointSegmentDistance(2, 3, GU::Line(0, 0, 3, 4)) << std::endl;
+    std::cout << GU.calc_pointSegmentDistance(-1, -1, GU::Line(0, 0, 3, 3), true) << std::endl;
 
 }

@@ -125,8 +125,10 @@ GU::Intersection GeometryUtils::calc_linesIntersect(const GU::Line& lineA, const
     return inc;
 }
 
-double GeometryUtils::calc_pointSegmentDistance(const double x, const double y, const GU::Line& line) {
-    double dx1, dy1, dx2, dy2, dx3, dy3, dot1, dot2, ll, cross;
+// 计算点到直线/线段的最短距离
+double GeometryUtils::calc_pointSegmentDistance(const double x, const double y, const GU::Line& line, bool measureLine) {
+    double dx1, dy1, dx2, dy2, dx3, dy3, dot1, dot2, ll;
+
     dx1 = line.endX - line.startX;
     dy1 = line.endY - line.startY;
     dx2 = x - line.startX;
@@ -139,6 +141,9 @@ double GeometryUtils::calc_pointSegmentDistance(const double x, const double y, 
 
     if (ll < 1e-10) {
         return std::sqrt(dx2 * dx2 + dy2 * dy2);
+    }
+    if (measureLine) {
+        return std::fabs((dx1 * dy2 - dx2 * dy1) / ll);
     }
     if (dot1 < 1e-10) {
         return std::sqrt(dx2 * dx2 + dy2 * dy2);
