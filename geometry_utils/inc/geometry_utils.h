@@ -46,6 +46,8 @@ public:
 
     GU::Intersection calc_linesIntersect(const GU::Line& lineA, const GU::Line& lineB);
 
+    double calc_pointSegmentDistance(const double x, const double y, const GU::Line& line);
+
     std::vector<GU::Intersection> calc_geometryIntersection(const std::vector<GU::Point>& region);
 
     double polygonArea(const std::vector<GU::Point>& region);

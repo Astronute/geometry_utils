@@ -58,15 +58,8 @@ void main() {
         fast_region[2 * i] = region_1[i].x;
         fast_region[2 * i + 1] = region_1[i].y;
     }
-    
-    std::vector<std::vector<GU::Point>> polygons = GU.calc_AnotB(region_0, region_1);
-    for (int i = 0; i < polygons.size(); ++i) {
-        GU.sort_polygon_vertices_ccw(polygons[i]);
-        for (auto p : polygons[i]) {
-            std::cout << "polygon " << i << ": " << p << std::endl;
-        }
-        std::cout << std::endl;
-    }
-
     delete[] fast_region;
+
+    std::cout << GU.calc_pointSegmentDistance(2, 3, GU::Line(0, 0, 3, 4)) << std::endl;
+
 }

@@ -125,6 +125,31 @@ GU::Intersection GeometryUtils::calc_linesIntersect(const GU::Line& lineA, const
     return inc;
 }
 
+double GeometryUtils::calc_pointSegmentDistance(const double x, const double y, const GU::Line& line) {
+    double dx1, dy1, dx2, dy2, dx3, dy3, dot1, dot2, ll, cross;
+    dx1 = line.endX - line.startX;
+    dy1 = line.endY - line.startY;
+    dx2 = x - line.startX;
+    dy2 = y - line.startY;
+    dx3 = x - line.endX;
+    dy3 = y - line.endY;
+    dot1 = dx1 * dx2 + dy1 * dy2;
+    dot2 = (-1.0 * dx1) * dx3 + (-1.0 * dy1) * dy3;
+    ll = std::sqrt(dx1 * dx1 + dy1 * dy1);
+
+    if (ll < 1e-10) {
+        return std::sqrt(dx2 * dx2 + dy2 * dy2);
+    }
+    if (dot1 < 1e-10) {
+        return std::sqrt(dx2 * dx2 + dy2 * dy2);
+    }
+    if (dot2 < 1e-10) {
+        return std::sqrt(dx3 * dx3 + dy3 * dy3);
+    }
+
+    return std::fabs((dx1 * dy2 - dx2 * dy1) / ll);
+}
+
 GU::Node* GeometryUtils::nextNonIntersection(GU::Node* n){
     GU::Node* node = n;
     do{
