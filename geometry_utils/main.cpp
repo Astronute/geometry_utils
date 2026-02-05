@@ -50,16 +50,9 @@ void main() {
     //                                    cv::Point(25.9256, 5.21851),
     //                                    cv::Point(32.5322, 11.8251) };
 
-    GeometryUtils GU;
+    GeometryUtils gu_;
 
-    int length = 2 * region_1.size();
-    double* fast_region = new double[length];
-    for (int i = 0; i < region_1.size(); ++i) {
-        fast_region[2 * i] = region_1[i].x;
-        fast_region[2 * i + 1] = region_1[i].y;
-    }
-    delete[] fast_region;
-
-    std::cout << GU.calc_pointSegmentDistance(-1, -1, GU::Line(0, 0, 3, 3), true) << std::endl;
-
+    GU::Line line = GU::Line(GU::Point(0, 0), GU::Point(5, 5));
+    double dis = gu_.calc_pointSegmentDistance(GU::Point(0, 5), line, true);
+    std::cout << dis << std::endl;
 }
