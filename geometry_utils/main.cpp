@@ -15,13 +15,15 @@
 //#include "opencv2/highgui.hpp"
 //#include "opencv2/videoio.hpp"
 
+using namespace GU;
 
 void main() {
     // region test
     //std::vector<GU::Point> region_0{ GU::Point(0, 0),
+    //                                   GU::Point(5, 0),
     //                                   GU::Point(10, 0),
-    //                                   GU::Point(10, 7),
-    //                                   GU::Point(0, 7)
+    //                                   GU::Point(5, 5),
+    //                                   GU::Point(0, 0)
     //};
 
     //std::vector<GU::Point> region_1{ GU::Point(0, 0),
@@ -39,10 +41,11 @@ void main() {
                                     GU::Point(44.902663113649666, 21.460745702264255),
                                     GU::Point(44.902663113649673, 17.578843467967129)
                                     };
-    std::vector<GU::Point> region_1{ GU::Point(6.1006657784124165, -1.7133066920493876),
-                                    GU::Point(42.902663113649666, -1.7133066920493876),
-                                    GU::Point(42.902663113649666, 19.460745702264255),
-                                    GU::Point(6.1006657784124165, 19.460745702264255)
+    std::vector<GU::Point> region_1{ GU::Point(-26.688798, -17.568103),
+                                    GU::Point(-22.532573, -2.074950),
+                                    GU::Point(-39.030405, -6.379716),
+                                    GU::Point(-39.925187, -18.238896),
+                                    GU::Point(-26.688798, -17.568103)
     };
     //std::vector<cv::Point> cv_region{ cv::Point(6.80226, -1.03985),
     //                                    cv::Point(22.0138,  1.4954),
@@ -50,9 +53,5 @@ void main() {
     //                                    cv::Point(25.9256, 5.21851),
     //                                    cv::Point(32.5322, 11.8251) };
 
-    GeometryUtils gu_;
-
-    GU::Line line = GU::Line(GU::Point(0, 0), GU::Point(5, 5));
-    double dis = gu_.calc_pointSegmentDistance(GU::Point(0, 5), line, true);
-    std::cout << dis << std::endl;
+    std::cout << GU::pointInPolygon(GU::Point(-0.859747, -2.632716), region_1, false) << std::endl;
 }
