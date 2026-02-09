@@ -567,6 +567,124 @@ namespace GU {
         return res;
     }
 
+    bool triangulate(GU::Node* polygon, std::vector<std::vector<Point>>& triangles) {
+
+        auto isConvex = [](const Point& p1, const Point& p2, const Point& p3) -> bool {
+            double Sx2 = p1(0) * p2(1) - p2(0) * p1(1) + p2(0) * p3(1) - p3(0) * p2(1) + p3(0) * p1(1) - p1(0) * p3(1);
+            return Sx2 > 1e-10;
+        };
+
+        auto validTriangle = [](GU::Node* root, const GU::Node* p1, const GU::Node* p2, const GU::Node* p3) -> bool {
+            GU::Node* cur_node = root;
+            double dx1, dy1, dx2, dy2, cross1, cross2, cross3;
+            do {
+                if (cur_node != p1 && cur_node != p2 && cur_node != p3) {
+                    dx1 = p2->p(0) - p1->p(0); dy1 = p2->p(1) - p1->p(1);
+                    dx2 = cur_node->p(0) - p1->p(0); dy2 = cur_node->p(1) - p1->p(1);
+                    cross1 = dx1 * dy2 - dy1 * dx2;
+                    dx1 = p3->p(0) - p2->p(0); dy1 = p3->p(1) - p2->p(1);
+                    dx2 = cur_node->p(0) - p2->p(0); dy2 = cur_node->p(1) - p2->p(1);
+                    cross2 = dx1 * dy2 - dy1 * dx2;
+                    dx1 = p1->p(0) - p3->p(0); dy1 = p1->p(1) - p3->p(1);
+                    dx2 = cur_node->p(0) - p3->p(0); dy2 = cur_node->p(1) - p3->p(1);
+                    cross3 = dx1 * dy2 - dy1 * dx2;
+
+                    if (cross1 > 0 && cross2 > 0 && cross3 > 0) {
+                        return false;
+                    }
+                }
+                cur_node = cur_node->next;
+            } while (cur_node != root);
+            return true;
+        };
+
+        auto listLen = [](GU::Node* root) -> int {
+            int len = 0;
+            GU::Node* cur = root;
+            do {
+                cur = cur->next;
+                len++;
+            } while (cur != root);
+            return len;
+        };
+
+        GU::Node* root = polygon;
+        GU::Node* cur_node = root;
+        while (listLen(cur_node) > 3) {
+            bool ear_found = false;
+
+            do {
+                GU::Node* pre_node = cur_node->prev;
+                GU::Node* next_node = cur_node->next;
+                if (isConvex(pre_node->p, cur_node->p, next_node->p) && validTriangle(root, pre_node, cur_node, next_node)) {
+                    triangles.push_back(std::vector<Point>({ pre_node->p, cur_node->p, next_node->p }));
+                    pre_node->next = next_node;
+                    next_node->prev = pre_node;
+                    cur_node->prev = nullptr;
+                    cur_node->next = nullptr;
+                    cur_node = pre_node;
+                    root = cur_node;
+                    ear_found = true;
+                    break;
+                }
+                else {
+                    cur_node = cur_node->next;
+                }
+            } while (cur_node != root);
+            if (!ear_found) {
+                triangles.clear();
+                std::cout << "triangulate failed" << std::endl;
+                return false;
+            }
+        }
+
+        if (listLen(cur_node) == 3) {
+            triangles.push_back(std::vector<Point>({ cur_node->prev->p, cur_node->p, cur_node->next->p }));
+        }
+
+        return true;
+    }
+
+    bool triangulate(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& triangles) {
+
+        if (polygon.size() < 3) {
+            return false;
+        }
+
+        std::vector<Node*> all_polygon_node;
+        Node* root = nullptr;
+        for (int i = 0; i < polygon.size(); ++i) {
+            Node* node = new Node();
+            all_polygon_node.push_back(node);
+            node->p = polygon[i];
+            if (root == nullptr) {
+                node->next = node;
+                node->prev = node;
+                root = node;
+            }
+            else {
+                Node* last_node = root->prev;
+                last_node->next = node;
+                root->prev = node;
+                node->prev = last_node;
+                node->next = root;
+            }
+        }
+
+        bool res = triangulate(root, triangles);
+
+        for (auto node : all_polygon_node) {
+            delete node;
+        }
+        all_polygon_node.clear();
+
+        return res;
+    }
+
+    bool convexDecompose(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& polygons) {
+        
+    }
+
 }
 
 

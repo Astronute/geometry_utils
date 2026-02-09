@@ -32,15 +32,22 @@ namespace GU {
         return os;
     }
 
+    // 双向链表节点
     struct Node {
         Point p;
+
         bool is_intersection = false;
+
         Node* next = nullptr;
+
         Node* prev = nullptr;
+
         Node* friend_n = nullptr; // 同交点的另一个多边形节点
+
         double dist; // alongA
     };
 
+    // 向量
     class Vector2d {
     public:
         Vector2d() {
@@ -113,14 +120,20 @@ namespace GU {
         return os;
     }
 
+    // 交点
     struct Intersection {
         Point p;
+
         double cross;
+
         double isParallel = false;
+
         double alongA = FLT_MAX;
+
         double alongB = FLT_MAX;
     };
 
+    // 线段
     struct Line {
         Line() {
         
@@ -142,6 +155,7 @@ namespace GU {
         bool valid;
     };
 
+    // 
     struct MatchPoint {
 
         MatchPoint(int idx, bool mh, bool ms) {

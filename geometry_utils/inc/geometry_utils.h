@@ -81,6 +81,14 @@ namespace GU {
     // 多边形布尔运算
     std::vector<std::vector<Point>> calc_AnotB(const std::vector<Point>& region_0, const std::vector<Point>& region_1);
 
+    // 凸分解，耳切法(不能处理自交多边形)
+    bool triangulate(GU::Node* polygon, std::vector<std::vector<Point>>& triangles);
+
+    bool triangulate(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& triangles);
+
+    // 凸分解，Hertel-Mehlhorn算法
+    bool convexDecompose(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& polygons);
+
     // 曲线抽稀
     std::vector<Point> simplifyCurve(const std::vector<Point>& curve, double epsilon);
 
