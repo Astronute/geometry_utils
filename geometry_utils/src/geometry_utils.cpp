@@ -448,7 +448,7 @@ namespace GU {
         double end_in = pointInPolygon(Point(line.endX, line.endY), polygon, true);
         s_in = std::fabs(s_in) < EPSILON ? 0.0 : s_in;
         end_in = std::fabs(end_in) < EPSILON ? 0.0 : end_in;
-        if (s_in * end_in == -1) {
+        if (s_in * end_in == -1 || (s_in == 0 && end_in == 0)) {
             return true;
         }
 
