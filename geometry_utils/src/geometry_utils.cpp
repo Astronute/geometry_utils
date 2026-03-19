@@ -455,11 +455,12 @@ namespace GU {
             v0 = v;
             v = polygon[i];
             Intersection inc = calc_linesIntersect(Line(v0.x, v0.y, v.x, v.y), line);
-            if (inc.isParallel || 
-                std::fabs(inc.alongA) < EPSILON || 
-                std::fabs(inc.alongA - 1.0) < EPSILON || 
-                std::fabs(inc.alongB) < EPSILON || 
-                std::fabs(inc.alongB - 1.0) < EPSILON
+
+            if (inc.isParallel ||
+                inc.alongA < EPSILON ||
+                inc.alongA > 1.0 - EPSILON ||
+                inc.alongB < EPSILON ||
+                inc.alongB > 1.0 - EPSILON
             ) {
                 continue;
             }
