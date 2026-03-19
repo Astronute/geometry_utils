@@ -19,13 +19,13 @@ using namespace GU;
 
 void main() {
     // region test
-    std::vector<GU::Point> region_0{ GU::Point(0, 0),
-                                       GU::Point(2, 2),
-                                       GU::Point(4, 0),
-                                       GU::Point(6, 2),
-                                       GU::Point(4, 1),
-                                       GU::Point(2, 4)
-    };
+    //std::vector<GU::Point> region_0{ GU::Point(0, 0),
+    //                                   GU::Point(2, 2),
+    //                                   GU::Point(4, 0),
+    //                                   GU::Point(6, 2),
+    //                                   GU::Point(4, 1),
+    //                                   GU::Point(2, 4)
+    //};
 
     //std::vector<GU::Point> region_1{ GU::Point(0, 0),
     //                                   GU::Point(10, 0),
@@ -35,13 +35,10 @@ void main() {
     //                                    GU::Point(0, 5.01)
     //};
 
-    //std::vector<GU::Point> region_0{ GU::Point(43.116028440043323, 19.843321803805768),
-    //                                GU::Point(38.73416055080979, 25.455209329963878),
-    //                                GU::Point(7.361910439408538, 23.630335169781997),
-    //                                GU::Point(6.9659761518011978, 21.460745702264255),
-    //                                GU::Point(44.902663113649666, 21.460745702264255),
-    //                                GU::Point(44.902663113649673, 17.578843467967129)
-    //                                };
+    std::vector<GU::Point> region_0{ GU::Point(-16.75037550195249, -18.257535480561696),
+                                    GU::Point(-12.042743982648728, -17.689368835927834),
+                                    GU::Point(-12.736123621650718, -23.210264776075398)
+                                    };
     //std::vector<GU::Point> region_1{ GU::Point(-26.688798, -17.568103),
     //                                GU::Point(-22.532573, -2.074950),
     //                                GU::Point(-39.030405, -6.379716),
@@ -54,19 +51,6 @@ void main() {
     //                                    cv::Point(25.9256, 5.21851),
     //                                    cv::Point(32.5322, 11.8251) };
 
-    GeometryUtils gu_;
-
-    Node* root = gu_.upgradePolygon(region_0);
-    gu_.printPolygon(root);
-    std::vector<std::vector<Point>> tri;
-    if (GU::triangulate(region_0, tri)) {
-        std::cout << "size " << tri.size() << std::endl;
-        for (int i = 0; i < tri.size(); ++i) {
-            std::cout << "tri: " << i << std::endl;
-            for (auto p : tri[i]) {
-                std::cout << p << std::endl;
-            }
-        }
-    }
-
+    bool cc = GU::calc_line_cross_polygon(GU::Line(GU::Point(-18.291195987584452, -17.994333503608065), GU::Point(-14.982549680277309, -20.438654901428244)), region_0);
+    std::cout << static_cast<int>(cc) << std::endl;
 }
