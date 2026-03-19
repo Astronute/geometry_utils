@@ -1,5 +1,5 @@
 #include "geometry_utils.h"
-
+#include <unordered_map>
 
 namespace GU {
 
@@ -438,7 +438,9 @@ namespace GU {
 
     // 判断线段是否与多边形有交点（不包括整条线段与边重叠）
     bool calc_line_cross_polygon(const Line& line, const std::vector<Point>& polygon) {
+        double EPSILON = 1e-6;
         int len = polygon.size();
+
         if (len < 3) {
             return false;
         }
@@ -448,13 +450,20 @@ namespace GU {
             return true;
         }
 
-
         Point v0, v = polygon[len - 1];
         for (int i = 0; i < len; ++i) {
             v0 = v;
             v = polygon[i];
             Intersection inc = calc_linesIntersect(Line(v0.x, v0.y, v.x, v.y), line);
-            if (!inc.isParallel && (inc.alongA > 1e-10 && inc.alongA < 1 - 1e-10) && (inc.alongB > 1e-10 && inc.alongB < 1 - 1e-10)) {
+            if (inc.isParallel || 
+                std::fabs(inc.alongA) < EPSILON || 
+                std::fabs(inc.alongA - 1.0) < EPSILON || 
+                std::fabs(inc.alongB) < EPSILON || 
+                std::fabs(inc.alongB - 1.0) < EPSILON
+            ) {
+                continue;
+            }
+            else {
                 return true;
             }
         }
@@ -681,8 +690,77 @@ namespace GU {
         return res;
     }
 
-    bool convexDecompose(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& polygons) {
+    bool convexDecompose(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& convexPolygons) {
+
+        if (polygon.size() < 3) {
+            return false;
+        }
+
+        std::vector<std::vector<Point>> triangles;
+        std::unordered_map<Node*, std::vector<char>> node_map;
+        std::vector<Node*> all_polygon_node;
+
+        auto isConvex = [](const Point& p1, const Point& p2, const Point& p3) -> bool {
+            double Sx2 = p1(0) * p2(1) - p2(0) * p1(1) + p2(0) * p3(1) - p3(0) * p2(1) + p3(0) * p1(1) - p1(0) * p3(1);
+            return Sx2 > 1e-10;
+            };
+
+        auto validTriangle = [](GU::Node* root, const GU::Node* p1, const GU::Node* p2, const GU::Node* p3) -> bool {
+            GU::Node* cur_node = root;
+            double dx1, dy1, dx2, dy2, cross1, cross2, cross3;
+            do {
+                if (cur_node != p1 && cur_node != p2 && cur_node != p3) {
+                    dx1 = p2->p(0) - p1->p(0); dy1 = p2->p(1) - p1->p(1);
+                    dx2 = cur_node->p(0) - p1->p(0); dy2 = cur_node->p(1) - p1->p(1);
+                    cross1 = dx1 * dy2 - dy1 * dx2;
+                    dx1 = p3->p(0) - p2->p(0); dy1 = p3->p(1) - p2->p(1);
+                    dx2 = cur_node->p(0) - p2->p(0); dy2 = cur_node->p(1) - p2->p(1);
+                    cross2 = dx1 * dy2 - dy1 * dx2;
+                    dx1 = p1->p(0) - p3->p(0); dy1 = p1->p(1) - p3->p(1);
+                    dx2 = cur_node->p(0) - p3->p(0); dy2 = cur_node->p(1) - p3->p(1);
+                    cross3 = dx1 * dy2 - dy1 * dx2;
+
+                    if (cross1 > 0 && cross2 > 0 && cross3 > 0) {
+                        return false;
+                    }
+                }
+                cur_node = cur_node->next;
+            } while (cur_node != root);
+            return true;
+        };
+
+        auto listLen = [](GU::Node* root) -> int {
+            int len = 0;
+            GU::Node* cur = root;
+            do {
+                cur = cur->next;
+                len++;
+            } while (cur != root);
+            return len;
+        };
+
+        // create vertex list
+        Node* root = nullptr;
+        for (int i = 0; i < polygon.size(); ++i) {
+            Node* node = new Node();
+            all_polygon_node.push_back(node);
+            node->p = polygon[i];
+            if (root == nullptr) {
+                node->next = node;
+                node->prev = node;
+                root = node;
+            }
+            else {
+                Node* last_node = root->prev;
+                last_node->next = node;
+                root->prev = node;
+                node->prev = last_node;
+                node->next = root;
+            }
+        }
         
+
+        std::vector<bool> link_mask();
     }
 
 }

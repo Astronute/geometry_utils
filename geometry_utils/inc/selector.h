@@ -28,7 +28,7 @@ public:
             0, 1, 2, 0;
         return select;
     }
-    // ignore inner ring
+    // A - B ignore inner ring
     Eigen::Matrix4i difference2() {
         Eigen::Matrix4i select;
         select << 0, 0, 0, 0,

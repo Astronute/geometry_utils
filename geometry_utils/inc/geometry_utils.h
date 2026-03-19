@@ -87,7 +87,7 @@ namespace GU {
     bool triangulate(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& triangles);
 
     // 凸分解，Hertel-Mehlhorn算法
-    bool convexDecompose(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& polygons);
+    bool convexDecompose(const std::vector<Point>& polygon, std::vector<std::vector<Point>>& convexPolygons);
 
     // 曲线抽稀
     std::vector<Point> simplifyCurve(const std::vector<Point>& curve, double epsilon);
